@@ -2,8 +2,8 @@
   "updatedAt": "2026-03-16T08:31:16.305Z",
   "source": "openclaw-live",
   "highlights": [
-    "当前有 1 个代理正在活动",
-    "运行在演示模式"
+    "摸鱼的锅铲正在工位区摸鱼",
+    "等待任务中..."
   ],
   "rooms": [
     {
@@ -54,7 +54,7 @@
   "agents": [
     {
       "id": "demo-agent",
-      "name": "Demo Agent",
+      "name": "摸鱼的锅铲",
       "room": "workstations",
       "position": {
         "x": 30,
@@ -72,7 +72,7 @@
         "accent": "#173e63",
         "skin": "#f3d1b0",
         "accessory": "headset",
-        "label": "Demo"
+        "label": "摸鱼"
       }
     }
   ]
