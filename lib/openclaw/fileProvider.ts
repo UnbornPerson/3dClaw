@@ -117,7 +117,7 @@ export class FileOpenClawProvider {
         model: binding.model,
         snapshotFile: binding.snapshotFile,
         operationsPattern: binding.operationsPattern,
-        notes: binding.notes
+        notes: binding.notes ?? ""
       };
       return result;
     }, {});
