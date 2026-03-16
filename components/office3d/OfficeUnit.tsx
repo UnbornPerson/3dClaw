@@ -1,11 +1,11 @@
-import { Html, RoundedBox } from "@react-three/drei";
+import { Html, Line, RoundedBox } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
 
 import styles from "@/styles/Office.module.css";
 
-import type { RenderedAgentState, RoomId } from "@/lib/openclaw/types";
+import type { AgentHeading, AgentState, RoomId } from "@/lib/openclaw/types";
 
 import {
   headingToRotation,
@@ -16,7 +16,7 @@ import {
 
 interface OfficeUnitProps {
   activeRoom: RoomId | "all";
-  agent: RenderedAgentState;
+  agent: AgentState;
   selected: boolean;
   seatAnchor?: SeatAnchor;
   onSelect: (agentId: string) => void;
@@ -37,20 +37,66 @@ export function OfficeUnit({
   const rightLegRef = useRef<THREE.Group>(null);
   const ringRef = useRef<THREE.Mesh>(null);
   const walkPhase = useRef(Math.random() * Math.PI * 2);
-  const floorPosition = toFloorPosition(agent.visualPosition);
-  const seatPosition = seatAnchor?.position;
-  const isSeated = Boolean(seatAnchor);
-  const [x, , z] = isSeated && seatPosition ? seatPosition : floorPosition;
+  const visualPosition = useRef({ x: agent.position.x, y: agent.position.y });
+  const trailRef = useRef<THREE.Vector3[]>([]);
+  const isMovingRef = useRef(false);
+  const headingRef = useRef<AgentHeading>("south");
+  const baseGroupRef = useRef<THREE.Group>(null);
+  
   const dimmed = activeRoom !== "all" && activeRoom !== agent.room;
   const baseOpacity = dimmed ? 0.34 : 1;
-  const rotationY = isSeated && seatAnchor ? seatAnchor.rotation : headingToRotation(agent.heading);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
+    // Determine movement target
+    const targetX = agent.position.x;
+    const targetY = agent.position.y;
+    const speed = 2.0;
+
+    const dx = targetX - visualPosition.current.x;
+    const dy = targetY - visualPosition.current.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > 0.05) {
+      isMovingRef.current = true;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        headingRef.current = dx >= 0 ? "east" : "west";
+      } else {
+        headingRef.current = dy >= 0 ? "south" : "north";
+      }
+      
+      const step = speed * delta;
+      if (step >= distance) {
+        visualPosition.current.x = targetX;
+        visualPosition.current.y = targetY;
+        isMovingRef.current = false;
+      } else {
+        visualPosition.current.x += (dx / distance) * step;
+        visualPosition.current.y += (dy / distance) * step;
+      }
+    } else {
+      isMovingRef.current = false;
+    }
+
+    const floorPosition = toFloorPosition(visualPosition.current);
+    const seatPosition = seatAnchor?.position;
+    const isSeated = Boolean(seatAnchor) && !isMovingRef.current;
+    const [x, , z] = isSeated && seatPosition ? seatPosition : floorPosition;
+
+    if (baseGroupRef.current) {
+      baseGroupRef.current.position.set(x, 0, z);
+    }
+    
+    // Update body animations
+    const rotationY = isSeated && seatAnchor ? seatAnchor.rotation : headingToRotation(headingRef.current);
+    if (bodyRef.current) {
+      bodyRef.current.rotation.set(0, rotationY, 0);
+    }
+
     const time = state.clock.elapsedTime + walkPhase.current;
-    const walkSwing = agent.isMoving ? Math.sin(time * 8) * 0.6 : 0;
+    const walkSwing = isMovingRef.current && !isSeated ? Math.sin(time * 8) * 0.6 : 0;
 
     if (bodyRef.current) {
-      const bob = agent.isMoving ? Math.sin(time * 8) * 0.06 : 0;
+      const bob = isMovingRef.current && !isSeated ? Math.sin(time * 8) * 0.06 : 0;
       bodyRef.current.position.y = isSeated ? 0.12 : 0.3 + bob;
     }
 
@@ -92,8 +138,10 @@ export function OfficeUnit({
     }
   });
 
+  const shouldShowLabel = agent.style.label && agent.style.label.length > 0;
+
   return (
-    <group position={[x, 0, z]}>
+    <group ref={baseGroupRef}>
       <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[0.48, 24]} />
         <meshBasicMaterial color="#150b07" opacity={0.22 * baseOpacity} transparent />
@@ -110,7 +158,6 @@ export function OfficeUnit({
         ref={bodyRef}
         onClick={() => onSelect(agent.id)}
         onPointerDown={(event) => event.stopPropagation()}
-        rotation={[0, rotationY, 0]}
       >
         <group ref={torsoRef}>
           <RoundedBox
@@ -212,24 +259,28 @@ export function OfficeUnit({
         </group>
       </group>
 
-      <Html center distanceFactor={11} position={[0.14, isSeated ? 1.44 : 1.86, 0]} sprite transform>
-        <button
-          className={`${styles.unitLabel} ${selected ? styles.unitLabelSelected : ""} ${
-            dimmed ? styles.unitLabelMuted : ""
-          }`}
-          onClick={() => onSelect(agent.id)}
-          type="button"
-        >
-          <strong>{agent.name}</strong>
-          <span>
-            {selected
-              ? `${roomDisplayNames[agent.room]} / ${
-                  isSeated ? "working at desk" : agent.isMoving ? "moving" : agent.action
-                }`
-              : agent.style.label}
-          </span>
-        </button>
-      </Html>
+      {(selected || shouldShowLabel) ? (
+        <Html center distanceFactor={11} position={[0.14, Boolean(seatAnchor) && !isMovingRef.current ? 1.44 : 1.86, 0]} sprite transform>
+          <button
+            className={`${styles.unitLabel} ${selected ? styles.unitLabelSelected : ""} ${
+              dimmed ? styles.unitLabelMuted : ""
+            }`}
+            onClick={() => onSelect(agent.id)}
+            type="button"
+          >
+            <strong>{agent.name}</strong>
+            {selected ? (
+              <span>
+                {`${roomDisplayNames[agent.room]} / ${
+                  Boolean(seatAnchor) && !isMovingRef.current ? "working at desk" : isMovingRef.current ? "moving" : agent.action
+                }`}
+              </span>
+            ) : shouldShowLabel ? (
+              <span>{agent.style.label}</span>
+            ) : null}
+          </button>
+        </Html>
+      ) : null}
     </group>
   );
 }

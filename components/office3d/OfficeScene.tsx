@@ -5,7 +5,7 @@ import * as THREE from "three";
 
 import styles from "@/styles/Office.module.css";
 
-import type { RenderedAgentState, RoomId, RoomSummary } from "@/lib/openclaw/types";
+import type { AgentState, RoomId, RoomSummary } from "@/lib/openclaw/types";
 
 import {
   floorSize,
@@ -21,7 +21,7 @@ import { OfficeUnit } from "./OfficeUnit";
 
 interface OfficeSceneProps {
   activeRoom: RoomId | "all";
-  agents: RenderedAgentState[];
+  agents: AgentState[];
   onSelectAgent: (agentId: string) => void;
   rooms: RoomSummary[];
   selectedAgentId: string;
@@ -228,13 +228,18 @@ function Furniture({ activeRoom }: { activeRoom: RoomId | "all" }) {
 
             {item.kind === "sofa" ? (
               <>
-                <RoundedBox args={[width, 0.56, depth]} castShadow position={[0, 0.34, 0]} radius={0.08}>
+                <RoundedBox args={[width - 0.2, 0.4, depth]} castShadow position={[0, 0.2, 0]} radius={0.1}>
                   <meshStandardMaterial color={item.color} opacity={opacity} transparent />
                 </RoundedBox>
-                <mesh castShadow position={[0, 0.76, -depth / 2 + 0.12]}>
-                  <boxGeometry args={[width, 0.46, 0.2]} />
+                <RoundedBox args={[width, 0.6, 0.3]} castShadow position={[0, 0.6, -depth / 2 + 0.15]} radius={0.15}>
                   <meshStandardMaterial color={item.accent ?? item.color} opacity={opacity} transparent />
-                </mesh>
+                </RoundedBox>
+                <RoundedBox args={[0.25, 0.5, depth]} castShadow position={[-width / 2 + 0.125, 0.35, 0]} radius={0.1}>
+                  <meshStandardMaterial color={item.accent ?? item.color} opacity={opacity} transparent />
+                </RoundedBox>
+                <RoundedBox args={[0.25, 0.5, depth]} castShadow position={[width / 2 - 0.125, 0.35, 0]} radius={0.1}>
+                  <meshStandardMaterial color={item.accent ?? item.color} opacity={opacity} transparent />
+                </RoundedBox>
               </>
             ) : null}
 
@@ -265,18 +270,13 @@ function Furniture({ activeRoom }: { activeRoom: RoomId | "all" }) {
 
             {item.kind === "bench" ? (
               <>
-                <RoundedBox args={[width, 0.16, depth]} castShadow position={[0, 0.5, 0]} radius={0.04}>
+                <RoundedBox args={[width, 0.24, depth]} castShadow position={[0, 0.5, 0]} radius={0.12}>
                   <meshStandardMaterial color={item.color} opacity={opacity} transparent />
                 </RoundedBox>
-                {[-0.75, 0.75].map((legX) => (
-                  <mesh castShadow key={`${item.id}-${legX}`} position={[legX, 0.26, 0]}>
-                    <boxGeometry args={[0.1, 0.5, 0.1]} />
-                    <meshStandardMaterial
-                      color={item.accent ?? "#2d6f5d"}
-                      opacity={opacity}
-                      transparent
-                    />
-                  </mesh>
+                {[-width / 2 + 0.2, width / 2 - 0.2].map((legX) => (
+                  <RoundedBox args={[0.15, 0.4, 0.15]} castShadow key={`${item.id}-${legX}`} position={[legX, 0.2, 0]} radius={0.05}>
+                    <meshStandardMaterial color={item.accent ?? "#2d6f5d"} opacity={opacity} transparent />
+                  </RoundedBox>
                 ))}
               </>
             ) : null}
@@ -287,39 +287,7 @@ function Furniture({ activeRoom }: { activeRoom: RoomId | "all" }) {
   );
 }
 
-function MotionTrails({ activeRoom, agents }: { activeRoom: RoomId | "all"; agents: RenderedAgentState[] }) {
-  return (
-    <>
-      {agents.map((agent) => {
-        if (!agent.isMoving) {
-          return null;
-        }
 
-        const opacity = getRoomOpacity(activeRoom, agent.room);
-        const [currentX, , currentZ] = toFloorPosition(agent.visualPosition);
-        const [previousX, , previousZ] = toFloorPosition(agent.previousPosition);
-
-        return (
-          <group key={`trail-${agent.id}`}>
-            <Line
-              color={agent.style.accent}
-              opacity={0.92 * opacity}
-              points={[
-                [previousX, 0.08, previousZ],
-                [currentX, 0.08, currentZ]
-              ]}
-              transparent
-            />
-            <mesh position={[currentX, 0.09, currentZ]}>
-              <sphereGeometry args={[0.12, 12, 12]} />
-              <meshBasicMaterial color={agent.style.accent} opacity={opacity} transparent />
-            </mesh>
-          </group>
-        );
-      })}
-    </>
-  );
-}
 
 function OfficeWorld({
   activeRoom,
@@ -334,8 +302,7 @@ function OfficeWorld({
   const seatedAssignments = useMemo(() => {
     const workingAgents = agents
       .filter(
-        (agent) =>
-          agent.room === "workstations" && agent.status === "working" && !agent.isMoving
+        (agent) => agent.room === "workstations" && agent.status === "working"
       )
       .sort((left, right) => left.id.localeCompare(right.id));
 
@@ -413,7 +380,7 @@ function OfficeWorld({
       })}
 
       <Furniture activeRoom={activeRoom} />
-      <MotionTrails activeRoom={activeRoom} agents={agents} />
+      {/* Furniture and Zones */}
 
       {agents.map((agent) => (
         <OfficeUnit
@@ -430,9 +397,7 @@ function OfficeWorld({
         <Html center distanceFactor={16} position={[0, floorSize.wallHeight + 0.55, -floorSize.depth / 2 + 0.22]} transform>
           <div className={styles.sceneCaption}>
             <strong>{selectedAgent.name}</strong>
-            <span>{`${roomDisplayNames[selectedAgent.room]} / ${
-              selectedAgent.isMoving ? "moving" : selectedAgent.status
-            }`}</span>
+            <span>{`${roomDisplayNames[selectedAgent.room]} / ${selectedAgent.status}`}</span>
           </div>
         </Html>
       ) : null}

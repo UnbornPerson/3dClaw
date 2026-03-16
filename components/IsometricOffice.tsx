@@ -2,13 +2,13 @@ import dynamic from "next/dynamic";
 
 import styles from "@/styles/Office.module.css";
 
-import type { RenderedAgentState, RoomId, RoomSummary } from "@/lib/openclaw/types";
+import type { AgentState, RoomId, RoomSummary } from "@/lib/openclaw/types";
 
 import { roomDisplayNames } from "@/components/office3d/sceneData";
 
 interface IsometricOfficeProps {
   rooms: RoomSummary[];
-  agents: RenderedAgentState[];
+  agents: AgentState[];
   activeRoom: RoomId | "all";
   selectedAgentId: string;
   onSelectAgent: (agentId: string) => void;
@@ -72,9 +72,7 @@ export function IsometricOffice({
           <strong>{selectedAgent?.name ?? "No unit"}</strong>
           <p>
             {selectedAgent
-              ? `${roomDisplayNames[selectedAgent.room]} / ${
-                  selectedAgent.isMoving ? "moving" : selectedAgent.status
-                }`
+              ? `${roomDisplayNames[selectedAgent.room]} / ${selectedAgent.status}`
               : "拖拽旋转、滚轮缩放，选择一只龙虾查看位置和动作。"}
           </p>
         </div>

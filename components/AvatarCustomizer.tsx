@@ -5,6 +5,7 @@ import type { Accessory, AgentState, AvatarStyle } from "@/lib/openclaw/types";
 interface AvatarCustomizerProps {
   agent: AgentState | null;
   onStyleChange: (patch: Partial<AvatarStyle>) => void;
+  onNameChange?: (name: string) => void;
   onReset: () => void;
 }
 
@@ -18,6 +19,7 @@ const accessoryOptions: Array<{ value: Accessory; label: string }> = [
 export function AvatarCustomizer({
   agent,
   onStyleChange,
+  onNameChange,
   onReset
 }: AvatarCustomizerProps) {
   if (!agent) {
@@ -55,6 +57,16 @@ export function AvatarCustomizer({
       </div>
 
       <div className={styles.formGrid}>
+        <label className={styles.field}>
+          <span className={styles.fieldLabel}>代号 / 昵称</span>
+          <input
+            className={styles.fieldControl}
+            onChange={(event) => onNameChange?.(event.target.value)}
+            type="text"
+            value={agent.name}
+          />
+        </label>
+
         <label className={styles.field}>
           <span className={styles.fieldLabel}>机体主色</span>
           <input

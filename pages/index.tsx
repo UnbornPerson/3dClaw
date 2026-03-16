@@ -13,7 +13,6 @@ import type {
   AvatarStyle,
   OperationAnalysis,
   OperationLog,
-  RenderedAgentState,
   RoomId,
   WorldSnapshot
 } from "@/lib/openclaw/types";
@@ -109,18 +108,13 @@ export default function HomePage({
   const [styleOverrides, setStyleOverrides] = useState<
     Record<string, Partial<AvatarStyle>>
   >({});
+  const [nameOverrides, setNameOverrides] = useState<Record<string, string>>({});
+  const [roamingTargets, setRoamingTargets] = useState<Record<string, { x: number; y: number }>>({});
   const [loading, setLoading] = useState(!initialSnapshot);
   const [error, setError] = useState(initialError);
   const [pollIntervalMs, setPollIntervalMs] = useState(initialPollIntervalMs);
-  const [sceneAgents, setSceneAgents] = useState<RenderedAgentState[]>([]);
   const [showAvatarDrawer, setShowAvatarDrawer] = useState(false);
   const [showSettingsDrawer, setShowSettingsDrawer] = useState(false);
-  const animationFrameRef = useRef<number | null>(null);
-  const sceneAgentsRef = useRef<RenderedAgentState[]>([]);
-
-  useEffect(() => {
-    sceneAgentsRef.current = sceneAgents;
-  }, [sceneAgents]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -137,6 +131,15 @@ export default function HomePage({
     } catch {
       window.localStorage.removeItem("claw-style-overrides");
     }
+
+    const cachedNames = window.localStorage.getItem("claw-name-overrides");
+    if (cachedNames) {
+      try {
+        setNameOverrides(JSON.parse(cachedNames));
+      } catch {
+        window.localStorage.removeItem("claw-name-overrides");
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -149,6 +152,40 @@ export default function HomePage({
       JSON.stringify(styleOverrides)
     );
   }, [styleOverrides]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(
+      "claw-name-overrides",
+      JSON.stringify(nameOverrides)
+    );
+  }, [nameOverrides]);
+
+  useEffect(() => {
+    if (!snapshot) return;
+
+    const interval = window.setInterval(() => {
+      setRoamingTargets((current) => {
+        const next = { ...current };
+        const idleAgents = snapshot.agents.filter((a) => a.status === "idle");
+        if (idleAgents.length > 0) {
+          const randomAgent = idleAgents[Math.floor(Math.random() * idleAgents.length)];
+          const basePos = current[randomAgent.id] ?? randomAgent.position;
+          
+          next[randomAgent.id] = {
+            x: Math.max(0, Math.min(100, basePos.x + (Math.random() - 0.5) * 20)),
+            y: Math.max(0, Math.min(100, basePos.y + (Math.random() - 0.5) * 20))
+          };
+        }
+        return next;
+      });
+    }, 3800);
+
+    return () => window.clearInterval(interval);
+  }, [snapshot]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -215,91 +252,16 @@ export default function HomePage({
       snapshot
         ? snapshot.agents.map((agent) => ({
             ...agent,
+            name: nameOverrides[agent.id] ?? agent.name,
+            position: roamingTargets[agent.id] ?? agent.position,
             style: {
               ...agent.style,
               ...(styleOverrides[agent.id] ?? {})
             }
           }))
         : [],
-    [snapshot, styleOverrides]
+    [snapshot, styleOverrides, nameOverrides, roamingTargets]
   );
-
-  useEffect(() => {
-    if (animationFrameRef.current !== null) {
-      window.cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
-
-    if (agents.length === 0) {
-      setSceneAgents([]);
-      return;
-    }
-
-    const currentById = new Map(sceneAgentsRef.current.map((agent) => [agent.id, agent]));
-    const prepared = agents.map((agent) => {
-      const previous = currentById.get(agent.id);
-      const startPosition = previous
-        ? { ...previous.visualPosition }
-        : { ...agent.position };
-      const moved =
-        Math.abs(agent.position.x - startPosition.x) > 0.08 ||
-        Math.abs(agent.position.y - startPosition.y) > 0.08;
-
-      return {
-        ...agent,
-        previousPosition: startPosition,
-        visualPosition: startPosition,
-        heading: previous ? getHeading(startPosition, agent.position) : "south",
-        isMoving: moved
-      };
-    });
-
-    if (sceneAgentsRef.current.length === 0) {
-      setSceneAgents(
-        prepared.map((agent) => ({
-          ...agent,
-          previousPosition: { ...agent.position },
-          visualPosition: { ...agent.position },
-          isMoving: false
-        }))
-      );
-      return;
-    }
-
-    setSceneAgents(prepared);
-
-    const animationStart = window.performance.now();
-
-    const tick = (now: number) => {
-      const progress = Math.min(1, (now - animationStart) / MOTION_DURATION_MS);
-
-      setSceneAgents(
-        prepared.map((agent) => ({
-          ...agent,
-          visualPosition: {
-            x: mix(agent.previousPosition.x, agent.position.x, progress),
-            y: mix(agent.previousPosition.y, agent.position.y, progress)
-          },
-          isMoving: agent.isMoving && progress < 0.999
-        }))
-      );
-
-      if (progress < 1) {
-        animationFrameRef.current = window.requestAnimationFrame(tick);
-      } else {
-        animationFrameRef.current = null;
-      }
-    };
-
-    animationFrameRef.current = window.requestAnimationFrame(tick);
-
-    return () => {
-      if (animationFrameRef.current !== null) {
-        window.cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
-      }
-    };
-  }, [agents]);
 
   const selectedAgent =
     agents.find((agent) => agent.id === selectedAgentId) ?? agents[0] ?? null;
@@ -320,6 +282,14 @@ export default function HomePage({
         ...current[selectedAgent.id],
         ...patch
       }
+    }));
+  }
+
+  function updateSelectedAgentName(name: string) {
+    if (!selectedAgent) return;
+    setNameOverrides((current) => ({
+      ...current,
+      [selectedAgent.id]: name
     }));
   }
 
@@ -358,6 +328,7 @@ export default function HomePage({
               agent={selectedAgent}
               onReset={resetSelectedAgentStyle}
               onStyleChange={updateSelectedAgentStyle}
+              onNameChange={updateSelectedAgentName}
             />
           </div>
         </div>
@@ -549,7 +520,7 @@ export default function HomePage({
 
                 <IsometricOffice
                   activeRoom={activeRoom}
-                  agents={sceneAgents}
+                  agents={agents as any}
                   onSelectAgent={setSelectedAgentId}
                   rooms={snapshot?.rooms ?? []}
                   selectedAgentId={selectedAgentId}
