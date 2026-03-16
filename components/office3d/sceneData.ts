@@ -61,32 +61,32 @@ export const zoneDefinitions: ZoneDefinition[] = [
     label: "",
     center: [-4.8, -3.3],
     size: [8.4, 4.2],
-    fill: "#ead6a5",
-    border: "#c89d55"
+    fill: "#a5d6ea",
+    border: "#559dc8"
   },
   {
     room: "workstations",
     label: "",
     center: [-2.6, 1.4],
     size: [11.4, 5.6],
-    fill: "#efe2b8",
-    border: "#d1af68"
+    fill: "#b8e2ef",
+    border: "#68afd1"
   },
   {
     room: "restaurant",
     label: "",
     center: [7.1, -2.8],
     size: [5.3, 4.3],
-    fill: "#e6d0b1",
-    border: "#cb865d"
+    fill: "#b1d0e6",
+    border: "#5d86cb"
   },
   {
     room: "gym",
     label: "",
     center: [7.1, 2.8],
     size: [5.2, 4.2],
-    fill: "#d6e3b9",
-    border: "#80aa72"
+    fill: "#b9e3d6",
+    border: "#72aa80"
   }
 ];
 
@@ -111,8 +111,8 @@ export const furnitureDefinitions: FurnitureDefinition[] = [
     room: "meeting",
     position: [-4.8, -3.35],
     size: [3.8, 0.36, 2.2],
-    color: "#bf8559",
-    accent: "#7d4f31"
+    color: "#5985bf",
+    accent: "#314f7d"
   },
   {
     id: "meeting-divider",
@@ -127,8 +127,8 @@ export const furnitureDefinitions: FurnitureDefinition[] = [
     kind: "plant",
     room: "meeting",
     position: [-8.8, -1.9],
-    color: "#5fa282",
-    accent: "#81614d"
+    color: "#5f82a2",
+    accent: "#4d6181"
   },
   {
     id: "server-a",
@@ -163,8 +163,8 @@ export const furnitureDefinitions: FurnitureDefinition[] = [
     room: "restaurant",
     position: [9.6, -4.4],
     size: [1.1, 1.0, 3.2],
-    color: "#bb805a",
-    accent: "#8a5a3f"
+    color: "#5a80bb",
+    accent: "#3f5a8a"
   },
   {
     id: "sofa-a",
@@ -181,22 +181,22 @@ export const furnitureDefinitions: FurnitureDefinition[] = [
     room: "restaurant",
     position: [8.8, -2.95],
     size: [1.2, 0.8, 3.1],
-    color: "#6d75ad",
-    accent: "#4d557f"
+    color: "#6d7ead",
+    accent: "#4d5b7f"
   },
   {
     id: "restaurant-stool-a",
     kind: "stool",
     room: "restaurant",
     position: [8.7, -4.3],
-    color: "#edc780"
+    color: "#80c7ed"
   },
   {
     id: "restaurant-stool-b",
     kind: "stool",
     room: "restaurant",
     position: [8.7, -3.25],
-    color: "#edc780"
+    color: "#80c7ed"
   },
   {
     id: "gym-bench",
@@ -204,8 +204,8 @@ export const furnitureDefinitions: FurnitureDefinition[] = [
     room: "gym",
     position: [6.2, 2.9],
     size: [2.3, 0.58, 1.0],
-    color: "#4d9f83",
-    accent: "#2d6f5d"
+    color: "#4d839f",
+    accent: "#2d5d6f"
   },
   {
     id: "gym-locker",
@@ -221,8 +221,8 @@ export const furnitureDefinitions: FurnitureDefinition[] = [
     kind: "plant",
     room: "gym",
     position: [8.8, 1.0],
-    color: "#59a47b",
-    accent: "#85624d"
+    color: "#597ba4",
+    accent: "#4d6285"
   },
   ...workstationRows.flatMap(([x, z], index) => [
     {
@@ -231,8 +231,8 @@ export const furnitureDefinitions: FurnitureDefinition[] = [
       room: "workstations" as const,
       position: [x, z] as [number, number],
       size: [1.8, 0.18, 0.95] as [number, number, number],
-      color: "#c89864",
-      accent: "#915f3d"
+      color: "#6498c8",
+      accent: "#3d5f91"
     },
     {
       id: `chair-${index}`,
@@ -240,8 +240,8 @@ export const furnitureDefinitions: FurnitureDefinition[] = [
       room: "workstations" as const,
       position: [x + 0.1, z + 0.95] as [number, number],
       size: [0.62, 0.6, 0.62] as [number, number, number],
-      color: "#697194",
-      accent: "#4e5671"
+      color: "#698194",
+      accent: "#4e6071"
     },
     {
       id: `screen-${index}`,

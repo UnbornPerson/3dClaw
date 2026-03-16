@@ -35,6 +35,7 @@ export function OfficeUnit({
   const rightArmRef = useRef<THREE.Group>(null);
   const leftLegRef = useRef<THREE.Group>(null);
   const rightLegRef = useRef<THREE.Group>(null);
+  const headRef = useRef<THREE.Group>(null);
   const ringRef = useRef<THREE.Mesh>(null);
   const walkPhase = useRef(Math.random() * Math.PI * 2);
   const visualPosition = useRef({ x: agent.position.x, y: agent.position.y });
@@ -105,12 +106,22 @@ export function OfficeUnit({
       torsoRef.current.position.y = isSeated ? -0.08 : 0;
     }
 
+    if (headRef.current) {
+      if (isSeated) {
+        headRef.current.rotation.y = -0.2 + Math.sin(time * 2) * 0.1;
+        headRef.current.rotation.z = Math.sin(time * 1.5) * 0.05;
+      } else {
+        headRef.current.rotation.y = Math.sin(time * 3) * 0.15;
+        headRef.current.rotation.z = isMovingRef.current ? Math.sin(time * 8) * 0.05 : 0;
+      }
+    }
+
     if (leftArmRef.current && rightArmRef.current) {
       if (isSeated) {
         leftArmRef.current.rotation.z = -1.05;
         rightArmRef.current.rotation.z = -1.12;
-        leftArmRef.current.rotation.x = 0.2;
-        rightArmRef.current.rotation.x = -0.15;
+        leftArmRef.current.rotation.x = 0.2 + Math.sin(time * 18) * 0.12;
+        rightArmRef.current.rotation.x = -0.15 + Math.cos(time * 18) * 0.12;
       } else {
         leftArmRef.current.rotation.z = walkSwing;
         rightArmRef.current.rotation.z = -walkSwing;
@@ -178,61 +189,51 @@ export function OfficeUnit({
             <meshStandardMaterial color={agent.style.accent} opacity={baseOpacity} transparent />
           </RoundedBox>
 
-          <mesh castShadow position={[0, 1.16, 0]}>
-            <boxGeometry args={[0.48, 0.5, 0.46]} />
-            <meshStandardMaterial color={agent.style.skin} opacity={baseOpacity} transparent />
-          </mesh>
+          <group ref={headRef} position={[0, 1.16, 0]}>
+            <RoundedBox args={[0.48, 0.5, 0.46]} castShadow radius={0.08}>
+              <meshStandardMaterial color={agent.style.skin} opacity={baseOpacity} transparent />
+            </RoundedBox>
 
-          <mesh castShadow position={[0, 1.42, 0]}>
-            <boxGeometry args={[0.52, 0.12, 0.5]} />
-            <meshStandardMaterial color="#4a2318" opacity={baseOpacity} transparent />
-          </mesh>
+            <RoundedBox args={[0.52, 0.12, 0.5]} castShadow position={[0, 0.26, 0]} radius={0.04}>
+              <meshStandardMaterial color="#2d3748" opacity={baseOpacity} transparent />
+            </RoundedBox>
 
-          <mesh castShadow position={[-0.08, 1.15, 0.21]}>
-            <boxGeometry args={[0.07, 0.07, 0.07]} />
-            <meshStandardMaterial color="#1f130e" opacity={baseOpacity} transparent />
-          </mesh>
+            <RoundedBox args={[0.38, 0.14, 0.1]} castShadow position={[-0.08, 0.02, 0.24]} radius={0.04}>
+              <meshStandardMaterial color="#7ce0ff" emissive="#7ce0ff" emissiveIntensity={0.5} opacity={0.9 * baseOpacity} transparent />
+            </RoundedBox>
 
-          <mesh castShadow position={[-0.08, 1.15, -0.21]}>
-            <boxGeometry args={[0.07, 0.07, 0.07]} />
-            <meshStandardMaterial color="#1f130e" opacity={baseOpacity} transparent />
-          </mesh>
-
-          <mesh castShadow position={[0.14, 1.02, 0.16]}>
-            <boxGeometry args={[0.18, 0.04, 0.18]} />
-            <meshStandardMaterial color="#2d1711" opacity={0.82 * baseOpacity} transparent />
-          </mesh>
-
-          <mesh castShadow position={[0.16, 1.52, 0.11]} rotation={[0.1, 0, 0.22]}>
-            <boxGeometry args={[0.04, 0.24, 0.04]} />
-            <meshStandardMaterial color={agent.style.accent} opacity={baseOpacity} transparent />
-          </mesh>
-
-          <mesh castShadow position={[0.16, 1.52, -0.11]} rotation={[-0.1, 0, 0.22]}>
-            <boxGeometry args={[0.04, 0.24, 0.04]} />
-            <meshStandardMaterial color={agent.style.accent} opacity={baseOpacity} transparent />
-          </mesh>
-
-          <group ref={leftArmRef} position={[-0.34, 0.72, 0.24]}>
-            <mesh castShadow position={[0, -0.22, 0]}>
-              <boxGeometry args={[0.16, 0.5, 0.16]} />
-              <meshStandardMaterial color={agent.style.body} opacity={baseOpacity} transparent />
+            <mesh castShadow position={[0.14, -0.14, 0.16]}>
+              <boxGeometry args={[0.18, 0.04, 0.18]} />
+              <meshStandardMaterial color="#1a202c" opacity={0.82 * baseOpacity} transparent />
             </mesh>
-            <mesh castShadow position={[0, -0.48, 0]}>
-              <boxGeometry args={[0.14, 0.18, 0.14]} />
+
+            <mesh castShadow position={[0.16, 0.36, 0.11]} rotation={[0.1, 0, 0.22]}>
+              <boxGeometry args={[0.04, 0.24, 0.04]} />
+              <meshStandardMaterial color={agent.style.accent} opacity={baseOpacity} transparent />
+            </mesh>
+
+            <mesh castShadow position={[0.16, 0.36, -0.11]} rotation={[-0.1, 0, 0.22]}>
+              <boxGeometry args={[0.04, 0.24, 0.04]} />
               <meshStandardMaterial color={agent.style.accent} opacity={baseOpacity} transparent />
             </mesh>
           </group>
 
-          <group ref={rightArmRef} position={[-0.34, 0.72, -0.24]}>
-            <mesh castShadow position={[0, -0.22, 0]}>
-              <boxGeometry args={[0.16, 0.5, 0.16]} />
+          <group ref={leftArmRef} position={[-0.34, 0.72, 0.24]}>
+            <RoundedBox args={[0.16, 0.5, 0.16]} castShadow position={[0, -0.22, 0]} radius={0.06}>
               <meshStandardMaterial color={agent.style.body} opacity={baseOpacity} transparent />
-            </mesh>
-            <mesh castShadow position={[0, -0.48, 0]}>
-              <boxGeometry args={[0.14, 0.18, 0.14]} />
-              <meshStandardMaterial color={agent.style.accent} opacity={baseOpacity} transparent />
-            </mesh>
+            </RoundedBox>
+            <RoundedBox args={[0.14, 0.18, 0.14]} castShadow position={[0, -0.48, 0]} radius={0.04}>
+              <meshStandardMaterial color={agent.style.skin} opacity={baseOpacity} transparent />
+            </RoundedBox>
+          </group>
+
+          <group ref={rightArmRef} position={[-0.34, 0.72, -0.24]}>
+            <RoundedBox args={[0.16, 0.5, 0.16]} castShadow position={[0, -0.22, 0]} radius={0.06}>
+              <meshStandardMaterial color={agent.style.body} opacity={baseOpacity} transparent />
+            </RoundedBox>
+            <RoundedBox args={[0.14, 0.18, 0.14]} castShadow position={[0, -0.48, 0]} radius={0.04}>
+              <meshStandardMaterial color={agent.style.skin} opacity={baseOpacity} transparent />
+            </RoundedBox>
           </group>
 
           <group ref={leftLegRef} position={[-0.15, -0.12, 0]}>

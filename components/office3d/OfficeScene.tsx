@@ -316,11 +316,11 @@ function OfficeWorld({
 
   return (
     <>
-      <color args={["#1a0d08"]} attach="background" />
-      <fog args={["#1a0d08", 18, 38]} attach="fog" />
+      <color args={["#08101a"]} attach="background" />
+      <fog args={["#08101a", 18, 38]} attach="fog" />
 
-      <ambientLight intensity={1.15} />
-      <hemisphereLight args={["#ffe6bc", "#5e4f40", 0.9]} />
+      <ambientLight intensity={1.2} color="#82c8ff" />
+      <hemisphereLight args={["#dcedff", "#404f5e", 1.8]} />
       <directionalLight
         castShadow
         intensity={1.6}
