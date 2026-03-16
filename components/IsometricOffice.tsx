@@ -22,12 +22,6 @@ const OfficeScene = dynamic(
   }
 );
 
-const toolDockItems = [
-  { id: "map", label: "MAP", meta: "房间" },
-  { id: "ops", label: "OPS", meta: "任务" },
-  { id: "unit", label: "UNIT", meta: "龙虾" }
-] as const;
-
 export function IsometricOffice({
   rooms,
   agents,
@@ -86,21 +80,6 @@ export function IsometricOffice({
         </div>
       </div>
 
-      <div className={styles.toolDock}>
-        {toolDockItems.map((item, index) => (
-          <button
-            className={`${styles.toolButton} ${index === 0 ? styles.toolButtonActive : ""}`}
-            key={item.id}
-            type="button"
-          >
-            <span className={styles.toolIndex}>{`0${index + 1}`}</span>
-            <span className={styles.toolMeta}>
-              <strong>{item.label}</strong>
-              <small>{item.meta}</small>
-            </span>
-          </button>
-        ))}
-      </div>
     </div>
   );
 }

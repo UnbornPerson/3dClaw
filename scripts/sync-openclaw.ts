@@ -122,18 +122,31 @@ function generateWorldFromSessions(sessions: any[], status: any): WorldData {
     });
   }
 
-  // If no sessions, add demo agents
+  // If no sessions, add demo agent with random movement
   if (agents.length === 0) {
+    // Random room positions
+    const roomPositions: Record<string, {x: number, y: number}> = {
+      workstations: { x: 20 + Math.random() * 20, y: 20 + Math.random() * 20 },
+      meeting: { x: 65 + Math.random() * 15, y: 15 + Math.random() * 15 },
+      gym: { x: 15 + Math.random() * 15, y: 65 + Math.random() * 20 },
+      restaurant: { x: 65 + Math.random() * 20, y: 60 + Math.random() * 20 }
+    };
+    const roomTypes = ["workstations", "meeting", "gym", "restaurant"] as const;
+    const statuses = ["working", "idle", "meeting", "eating", "training"] as const;
+    const actions = ["处理任务中", "等待任务", "会议中", "用餐中", "训练中"];
+    const randomRoom = roomTypes[Math.floor(Math.random() * roomTypes.length)];
+    const pos = roomPositions[randomRoom];
+    
     agents.push({
       id: "demo-agent",
-      name: "Demo Agent",
-      room: "workstations",
-      position: { x: 30, y: 30 },
-      action: "等待任务",
-      status: "idle",
-      target: "none",
-      energy: 100,
-      focus: 100,
+      name: "摸鱼的锅铲",
+      room: randomRoom,
+      position: { x: Math.round(pos.x * 10) / 10, y: Math.round(pos.y * 10) / 10 },
+      action: actions[Math.floor(Math.random() * actions.length)],
+      status: statuses[Math.floor(Math.random() * statuses.length)],
+      target: "demo-task",
+      energy: Math.floor(Math.random() * 30) + 70,
+      focus: Math.floor(Math.random() * 30) + 70,
       lastSeen: now,
       modelBindingKey: "lobster.alpha",
       style: {
@@ -141,7 +154,7 @@ function generateWorldFromSessions(sessions: any[], status: any): WorldData {
         accent: "#173e63",
         skin: "#f3d1b0",
         accessory: "headset",
-        label: "Demo"
+        label: "摸鱼"
       }
     });
   }

@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-03-16T08:31:16.305Z",
+  "updatedAt": "2026-03-16T09:57:12.462Z",
   "source": "openclaw-live",
   "highlights": [
-    "摸鱼的锅铲正在工位区摸鱼",
-    "等待任务中..."
+    "当前有 1 个代理正在活动",
+    "运行在演示模式"
   ],
   "rooms": [
     {
@@ -55,17 +55,17 @@
     {
       "id": "demo-agent",
       "name": "摸鱼的锅铲",
-      "room": "workstations",
+      "room": "gym",
       "position": {
-        "x": 30,
-        "y": 30
+        "x": 19.7,
+        "y": 75.6
       },
-      "action": "等待任务",
-      "status": "idle",
-      "target": "none",
-      "energy": 100,
-      "focus": 100,
-      "lastSeen": "2026-03-16T08:31:16.305Z",
+      "action": "训练中",
+      "status": "training",
+      "target": "demo-task",
+      "energy": 86,
+      "focus": 92,
+      "lastSeen": "2026-03-16T09:57:12.462Z",
       "modelBindingKey": "lobster.alpha",
       "style": {
         "body": "#dc5f42",
