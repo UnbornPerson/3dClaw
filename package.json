@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "inspect:openclaw": "node scripts/openclaw-inspect.mjs"
+    "inspect:openclaw": "node scripts/openclaw-inspect.mjs",
+    "sync:openclaw": "ts-node scripts/sync-openclaw.ts"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",
@@ -20,6 +21,7 @@
     "@types/node": "18.19.34",
     "@types/react": "18.2.66",
     "@types/react-dom": "18.2.22",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
 }

@@ -1,11 +1,9 @@
 {
-  "updatedAt": "2026-03-16T02:20:00.000Z",
-  "source": "openclaw-demo-floor",
+  "updatedAt": "2026-03-16T08:31:16.305Z",
+  "source": "openclaw-live",
   "highlights": [
-    "工位区有 3 个龙虾代理正在执行任务",
-    "会议室正在进行一次同步评审",
-    "健身房里有代理在做动作校准训练",
-    "餐厅里有代理处于补能休息状态"
+    "当前有 1 个代理正在活动",
+    "运行在演示模式"
   ],
   "rooms": [
     {
@@ -14,7 +12,10 @@
       "description": "核心执行与排班区域",
       "capacity": 8,
       "color": "#c96b3f",
-      "anchor": { "x": 27, "y": 24 }
+      "anchor": {
+        "x": 27,
+        "y": 24
+      }
     },
     {
       "id": "meeting",
@@ -22,7 +23,10 @@
       "description": "策略评审与联动决策",
       "capacity": 4,
       "color": "#4b7a78",
-      "anchor": { "x": 72, "y": 20 }
+      "anchor": {
+        "x": 72,
+        "y": 20
+      }
     },
     {
       "id": "gym",
@@ -30,7 +34,10 @@
       "description": "恢复训练与动作校准",
       "capacity": 3,
       "color": "#6b8a48",
-      "anchor": { "x": 22, "y": 72 }
+      "anchor": {
+        "x": 22,
+        "y": 72
+      }
     },
     {
       "id": "restaurant",
@@ -38,128 +45,34 @@
       "description": "能量补给与休息",
       "capacity": 5,
       "color": "#b2834e",
-      "anchor": { "x": 73, "y": 68 }
+      "anchor": {
+        "x": 73,
+        "y": 68
+      }
     }
   ],
   "agents": [
     {
-      "id": "ada-claw",
-      "name": "Ada Claw",
+      "id": "demo-agent",
+      "name": "Demo Agent",
       "room": "workstations",
-      "position": { "x": 20, "y": 32 },
-      "action": "检查今日 openclaw 执行队列",
-      "status": "working",
-      "target": "task-batch-17",
-      "energy": 78,
-      "focus": 92,
-      "lastSeen": "2026-03-16T02:19:10.000Z",
+      "position": {
+        "x": 30,
+        "y": 30
+      },
+      "action": "等待任务",
+      "status": "idle",
+      "target": "none",
+      "energy": 100,
+      "focus": 100,
+      "lastSeen": "2026-03-16T08:31:16.305Z",
       "modelBindingKey": "lobster.alpha",
       "style": {
         "body": "#dc5f42",
         "accent": "#173e63",
         "skin": "#f3d1b0",
         "accessory": "headset",
-        "label": "Ops Lead"
-      }
-    },
-    {
-      "id": "brine-jet",
-      "name": "Brine Jet",
-      "room": "workstations",
-      "position": { "x": 31, "y": 45 },
-      "action": "等待下一批动作文件",
-      "status": "idle",
-      "target": "queue-watch",
-      "energy": 62,
-      "focus": 54,
-      "lastSeen": "2026-03-16T01:56:00.000Z",
-      "modelBindingKey": "lobster.alpha",
-      "style": {
-        "body": "#3c76b2",
-        "accent": "#f2c053",
-        "skin": "#edcfaf",
-        "accessory": "visor",
-        "label": "Queue Watch"
-      }
-    },
-    {
-      "id": "coral-sync",
-      "name": "Coral Sync",
-      "room": "meeting",
-      "position": { "x": 70, "y": 25 },
-      "action": "同步会议室中的联动状态",
-      "status": "meeting",
-      "target": "briefing-room-a",
-      "energy": 83,
-      "focus": 88,
-      "lastSeen": "2026-03-16T02:18:40.000Z",
-      "modelBindingKey": "lobster.meeting",
-      "style": {
-        "body": "#1e9082",
-        "accent": "#ffcf68",
-        "skin": "#f2d4b8",
-        "accessory": "cap",
-        "label": "Sync Host"
-      }
-    },
-    {
-      "id": "dock-runner",
-      "name": "Dock Runner",
-      "room": "restaurant",
-      "position": { "x": 73, "y": 67 },
-      "action": "补能并等待 grip 文件重试",
-      "status": "eating",
-      "target": "meal-cycle",
-      "energy": 91,
-      "focus": 58,
-      "lastSeen": "2026-03-16T02:17:08.000Z",
-      "modelBindingKey": "lobster.ops",
-      "style": {
-        "body": "#cf6a4b",
-        "accent": "#334d5c",
-        "skin": "#f3d2b2",
-        "accessory": "badge",
-        "label": "Recover"
-      }
-    },
-    {
-      "id": "fin-atlas",
-      "name": "Fin Atlas",
-      "room": "gym",
-      "position": { "x": 22, "y": 72 },
-      "action": "执行 claw 姿态恢复训练",
-      "status": "training",
-      "target": "pose-reset",
-      "energy": 70,
-      "focus": 76,
-      "lastSeen": "2026-03-16T02:19:32.000Z",
-      "modelBindingKey": "lobster.training",
-      "style": {
-        "body": "#637c3d",
-        "accent": "#15324c",
-        "skin": "#efd1b1",
-        "accessory": "headset",
-        "label": "Motion Lab"
-      }
-    },
-    {
-      "id": "giga-shell",
-      "name": "Giga Shell",
-      "room": "workstations",
-      "position": { "x": 44, "y": 28 },
-      "action": "审核失败动作的回放结果",
-      "status": "working",
-      "target": "replay-check",
-      "energy": 67,
-      "focus": 89,
-      "lastSeen": "2026-03-16T02:19:22.000Z",
-      "modelBindingKey": "lobster.ops",
-      "style": {
-        "body": "#8546a7",
-        "accent": "#f5d26a",
-        "skin": "#f0cfad",
-        "accessory": "visor",
-        "label": "Replay QA"
+        "label": "Demo"
       }
     }
   ]
