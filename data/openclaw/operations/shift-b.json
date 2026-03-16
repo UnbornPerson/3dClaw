@@ -1,0 +1,62 @@
+[
+  {
+    "id": "op-006",
+    "agentId": "brine-jet",
+    "timestamp": "2026-03-16T01:56:00.000Z",
+    "type": "system",
+    "room": "workstations",
+    "detail": "队列巡检完成，但没有抓到新的动作文件。",
+    "file": "watchers/queue-watch.openclaw.json",
+    "durationSec": 142,
+    "success": true,
+    "risk": "low"
+  },
+  {
+    "id": "op-007",
+    "agentId": "dock-runner",
+    "timestamp": "2026-03-16T01:51:20.000Z",
+    "type": "move",
+    "room": "restaurant",
+    "detail": "从工位区移动到餐厅等待 grip 文件重试窗口。",
+    "file": "moves/dock-to-restaurant.openclaw.json",
+    "durationSec": 78,
+    "success": false,
+    "risk": "high"
+  },
+  {
+    "id": "op-008",
+    "agentId": "fin-atlas",
+    "timestamp": "2026-03-16T01:48:42.000Z",
+    "type": "training",
+    "room": "gym",
+    "detail": "第二组恢复训练完成，关节角度误差下降 11%。",
+    "file": "training/pose-reset-round-2.openclaw.json",
+    "durationSec": 336,
+    "success": true,
+    "risk": "low"
+  },
+  {
+    "id": "op-009",
+    "agentId": "ada-claw",
+    "timestamp": "2026-03-16T01:44:14.000Z",
+    "type": "task",
+    "room": "workstations",
+    "detail": "生成新的 claw 执行草案并提交给 Giga Shell 复核。",
+    "file": "queue/task-draft-16.openclaw.json",
+    "durationSec": 298,
+    "success": true,
+    "risk": "low"
+  },
+  {
+    "id": "op-010",
+    "agentId": "coral-sync",
+    "timestamp": "2026-03-16T01:40:30.000Z",
+    "type": "meeting",
+    "room": "meeting",
+    "detail": "记录会议室内关于 grip 故障的决策并同步到 ops 模型。",
+    "file": "meetings/grip-incident.openclaw.json",
+    "durationSec": 418,
+    "success": true,
+    "risk": "medium"
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "op-001",
+    "agentId": "ada-claw",
+    "timestamp": "2026-03-16T02:19:00.000Z",
+    "type": "task",
+    "room": "workstations",
+    "detail": "完成 task-batch-17 的排班整理并写入执行队列。",
+    "file": "queue/task-batch-17.openclaw.json",
+    "durationSec": 248,
+    "success": true,
+    "risk": "low"
+  },
+  {
+    "id": "op-002",
+    "agentId": "coral-sync",
+    "timestamp": "2026-03-16T02:17:20.000Z",
+    "type": "meeting",
+    "room": "meeting",
+    "detail": "会议室同步了四个代理的状态摘要并输出了简报。",
+    "file": "meetings/briefing-room-a.openclaw.json",
+    "durationSec": 520,
+    "success": true,
+    "risk": "low"
+  },
+  {
+    "id": "op-003",
+    "agentId": "fin-atlas",
+    "timestamp": "2026-03-16T02:14:40.000Z",
+    "type": "training",
+    "room": "gym",
+    "detail": "完成 claw 姿态恢复训练第一组动作校准。",
+    "file": "training/pose-reset-round-1.openclaw.json",
+    "durationSec": 302,
+    "success": true,
+    "risk": "medium"
+  },
+  {
+    "id": "op-004",
+    "agentId": "dock-runner",
+    "timestamp": "2026-03-16T02:11:24.000Z",
+    "type": "warning",
+    "room": "restaurant",
+    "detail": "读取 grip-log-03 时发现指令文件校验失败，已转入补能与等待重试。",
+    "file": "retry/grip-log-03.openclaw.json",
+    "durationSec": 89,
+    "success": false,
+    "risk": "high"
+  },
+  {
+    "id": "op-005",
+    "agentId": "giga-shell",
+    "timestamp": "2026-03-16T02:08:12.000Z",
+    "type": "system",
+    "room": "workstations",
+    "detail": "完成失败动作回放分析并回填原因标签。",
+    "file": "replay/replay-check-09.openclaw.json",
+    "durationSec": 166,
+    "success": true,
+    "risk": "medium"
+  }
+]

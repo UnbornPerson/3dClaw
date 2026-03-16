@@ -1,0 +1,644 @@
+.page {
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.appShell {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 16px;
+  min-height: calc(100vh - 32px);
+}
+
+.navRail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 8px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 187, 130, 0.1);
+  background: linear-gradient(180deg, rgba(27, 15, 10, 0.94), rgba(15, 9, 6, 0.96));
+  box-shadow: 0 20px 40px rgba(7, 3, 2, 0.26);
+}
+
+.navBrand {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin-bottom: 2px;
+  border-radius: 12px;
+  background: rgba(255, 177, 96, 0.12);
+  color: #ffc37a;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.navButton {
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 187, 130, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 231, 204, 0.62);
+  cursor: pointer;
+}
+
+.navButtonActive {
+  background: rgba(255, 177, 96, 0.14);
+  color: #ffca89;
+}
+
+.workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.topBar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 304px;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.commandDeck,
+.scenePanel,
+.panelCard,
+.statusCard {
+  border: 1px solid rgba(255, 186, 130, 0.1);
+  background: linear-gradient(180deg, rgba(28, 16, 11, 0.94), rgba(16, 9, 7, 0.96));
+  box-shadow: 0 22px 46px rgba(7, 3, 2, 0.24);
+}
+
+.commandDeck {
+  display: grid;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 24px;
+}
+
+.commandHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.commandTitle {
+  margin: 0;
+  color: #fff0dc;
+  font-size: 22px;
+  line-height: 1.05;
+}
+
+.commandMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: rgba(255, 220, 185, 0.5);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.agentStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.agentChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 116px;
+  padding: 9px 12px;
+  border: 1px solid rgba(255, 186, 130, 0.12);
+  border-radius: 999px;
+  background: rgba(17, 11, 9, 0.92);
+  color: #fff1dd;
+  cursor: pointer;
+}
+
+.agentChipActive {
+  border-color: rgba(94, 236, 220, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(94, 236, 220, 0.14);
+}
+
+.agentChipDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--dot-color);
+  box-shadow: 0 0 0 4px rgba(255, 191, 102, 0.08);
+}
+
+.agentChipMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.agentChipMeta strong {
+  font-size: 12px;
+}
+
+.agentChipMeta span {
+  color: rgba(255, 229, 202, 0.56);
+  font-size: 10px;
+}
+
+.topWidgets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.statusCard {
+  padding: 14px;
+  border-radius: 20px;
+}
+
+.statusLabel {
+  color: rgba(255, 220, 185, 0.52);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.statusValue {
+  display: block;
+  margin-top: 8px;
+  color: #fff0dd;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.statusCard p {
+  margin: 8px 0 0;
+  color: rgba(255, 229, 202, 0.56);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.sceneToolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.roomSelector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.roomButton {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  padding: 9px 12px;
+  border: 1px solid rgba(255, 186, 130, 0.12);
+  border-radius: 999px;
+  background: rgba(18, 11, 9, 0.9);
+  color: #fff1dc;
+  cursor: pointer;
+}
+
+.roomButtonActive {
+  background: rgba(255, 180, 105, 0.12);
+  border-color: rgba(255, 180, 105, 0.26);
+}
+
+.roomButton strong {
+  color: rgba(255, 229, 202, 0.56);
+  font-size: 11px;
+}
+
+.inlineMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.primaryPill,
+.secondaryPill,
+.panelHint,
+.badge,
+.smallStat,
+.agentRoom {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+}
+
+.primaryPill,
+.panelHint {
+  background: rgba(94, 236, 220, 0.1);
+  border: 1px solid rgba(94, 236, 220, 0.16);
+  color: #c0fbf1;
+}
+
+.secondaryPill,
+.smallStat,
+.agentRoom {
+  background: rgba(255, 180, 105, 0.1);
+  border: 1px solid rgba(255, 180, 105, 0.16);
+  color: #ffd7a8;
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 14px;
+  align-items: start;
+}
+
+.scenePanel {
+  padding: 16px;
+  border-radius: 26px;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.panelTitle {
+  margin: 0;
+  color: #fff1de;
+  font-size: 22px;
+}
+
+.bottomBar,
+.highlightList,
+.bindingGrid,
+.warningStack,
+.feedList,
+.formGrid,
+.progressGroup {
+  display: grid;
+  gap: 12px;
+}
+
+.bottomBar {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 14px;
+}
+
+.smallStat {
+  justify-content: center;
+}
+
+.inspectorColumn {
+  display: grid;
+  gap: 14px;
+}
+
+.panelCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 22px;
+}
+
+.bindingGuide {
+  display: grid;
+  gap: 10px;
+}
+
+.bindingGuide div {
+  display: grid;
+  gap: 5px;
+}
+
+.bindingGuide code,
+.command {
+  display: block;
+  width: 100%;
+  padding: 11px 12px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: rgba(8, 7, 6, 0.92);
+  color: #ffe6c5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1px solid rgba(255, 186, 130, 0.08);
+}
+
+.bindingLabel,
+.helperText,
+.feedMeta,
+.kpiLabel,
+.fieldLabel {
+  color: rgba(255, 229, 202, 0.5);
+}
+
+.helperText {
+  margin: 0;
+  color: rgba(255, 229, 202, 0.64);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.kpiItem {
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 186, 130, 0.08);
+}
+
+.kpiItem strong {
+  display: block;
+  margin-top: 6px;
+  color: #fff1de;
+  font-size: 22px;
+}
+
+.warningCard,
+.feedItem,
+.agentSummary {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 186, 130, 0.08);
+}
+
+.warningCard {
+  padding: 12px;
+}
+
+.warningCard p {
+  margin: 8px 0 0;
+  color: rgba(255, 229, 202, 0.74);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  padding: 5px 9px;
+  text-transform: uppercase;
+}
+
+.badgeLow {
+  background: rgba(51, 150, 101, 0.14);
+  color: #85e0b2;
+}
+
+.badgeMedium {
+  background: rgba(188, 131, 37, 0.14);
+  color: #ffca74;
+}
+
+.badgeHigh {
+  background: rgba(202, 82, 60, 0.14);
+  color: #ff9c89;
+}
+
+.feedList {
+  max-height: 380px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.feedItem {
+  padding: 12px;
+}
+
+.feedItemFocused {
+  border-color: rgba(94, 236, 220, 0.28);
+}
+
+.feedMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.feedTitleRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.feedTitle {
+  color: #fff2df;
+  font-size: 14px;
+}
+
+.feedDetail {
+  margin: 8px 0;
+  color: rgba(255, 229, 202, 0.76);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.emptyState {
+  padding: 22px 16px;
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 186, 130, 0.14);
+  color: rgba(255, 229, 202, 0.56);
+  text-align: center;
+}
+
+.agentSummary {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+}
+
+.agentSummary strong {
+  color: #fff2df;
+}
+
+.agentSummary p {
+  margin: 6px 0 0;
+  color: rgba(255, 229, 202, 0.62);
+  font-size: 13px;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+}
+
+.fieldLabel {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fieldControl,
+.colorInput {
+  width: 100%;
+  border: 1px solid rgba(255, 186, 130, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff2df;
+}
+
+.fieldControl {
+  padding: 11px 12px;
+}
+
+.colorInput {
+  height: 44px;
+  padding: 4px;
+}
+
+.secondaryButton {
+  padding: 9px 12px;
+  border: 1px solid rgba(255, 186, 130, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff2df;
+  cursor: pointer;
+}
+
+.progressItem {
+  display: grid;
+  gap: 7px;
+}
+
+.progressMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: rgba(255, 229, 202, 0.72);
+  font-size: 13px;
+}
+
+.progressBar {
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.progressFillWarm,
+.progressFillCool {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.progressFillWarm {
+  background: linear-gradient(90deg, #ffbf70, #ce6c41);
+}
+
+.progressFillCool {
+  background: linear-gradient(90deg, #76ddd0, #3db5a8);
+}
+
+.bindingCard {
+  display: grid;
+  gap: 7px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(8, 7, 6, 0.92);
+  border: 1px solid rgba(255, 186, 130, 0.08);
+  color: #ffe8ca;
+}
+
+.bindingCard p,
+.bindingCard strong {
+  margin: 0;
+}
+
+.bindingMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: rgba(255, 229, 202, 0.64);
+  font-size: 12px;
+}
+
+.errorBanner {
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(202, 82, 60, 0.12);
+  border: 1px solid rgba(202, 82, 60, 0.22);
+  color: #ffb09b;
+}
+
+@media (max-width: 1320px) {
+  .topBar,
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding: 12px;
+  }
+
+  .appShell {
+    grid-template-columns: 1fr;
+  }
+
+  .navRail {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .sceneToolbar,
+  .inlineMeta,
+  .commandHead {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .topWidgets,
+  .kpiRow,
+  .bottomBar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .topWidgets,
+  .kpiRow,
+  .bottomBar {
+    grid-template-columns: 1fr;
+  }
+
+  .scenePanel,
+  .panelCard,
+  .commandDeck {
+    padding: 14px;
+    border-radius: 20px;
+  }
+}

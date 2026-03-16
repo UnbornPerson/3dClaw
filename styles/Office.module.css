@@ -1,0 +1,314 @@
+.stage {
+  position: relative;
+  overflow: hidden;
+  min-height: 780px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255, 220, 170, 0.14), transparent 25%),
+    radial-gradient(circle at 70% 18%, rgba(115, 214, 203, 0.12), transparent 20%),
+    linear-gradient(180deg, #2a140c 0%, #150906 100%);
+  border: 1px solid rgba(255, 184, 126, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 233, 211, 0.05),
+    0 28px 60px rgba(8, 3, 2, 0.3);
+}
+
+.stageGlow {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 58%, rgba(255, 236, 187, 0.14), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 24%);
+}
+
+.canvasMount {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  cursor: grab;
+}
+
+.canvas:active {
+  cursor: grabbing;
+}
+
+.canvasFallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: rgba(255, 238, 220, 0.78);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sceneHud,
+.toolDock {
+  position: absolute;
+  z-index: 3;
+}
+
+.sceneHud {
+  left: 18px;
+  top: 18px;
+  display: grid;
+  gap: 10px;
+  width: 196px;
+  pointer-events: none;
+}
+
+.hudCard,
+.hudTicker,
+.toolButton {
+  border: 1px solid rgba(255, 190, 134, 0.14);
+  background: linear-gradient(180deg, rgba(18, 12, 10, 0.88), rgba(9, 8, 7, 0.92));
+  box-shadow: 0 16px 30px rgba(6, 3, 2, 0.24);
+  backdrop-filter: blur(10px);
+}
+
+.hudCard,
+.hudTicker {
+  padding: 12px 14px;
+  border-radius: 14px;
+}
+
+.hudCaption {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(255, 220, 186, 0.5);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.hudCard strong,
+.hudTicker strong {
+  display: block;
+  color: #fff1dc;
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.hudStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.hudStat {
+  display: grid;
+  gap: 3px;
+  padding: 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 230, 208, 0.6);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.hudStat em {
+  color: #95f0e3;
+  font-style: normal;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.hudTicker p {
+  margin: 8px 0 0;
+  color: rgba(255, 230, 208, 0.68);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.toolDock {
+  right: 18px;
+  top: 50%;
+  display: grid;
+  gap: 10px;
+  width: 154px;
+  transform: translateY(-50%);
+}
+
+.toolButton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  border-radius: 14px;
+  color: #fff2df;
+  cursor: pointer;
+  text-align: left;
+}
+
+.toolButtonActive {
+  border-color: rgba(88, 238, 221, 0.26);
+  box-shadow:
+    inset 0 0 0 1px rgba(88, 238, 221, 0.14),
+    0 18px 28px rgba(6, 3, 2, 0.28);
+}
+
+.toolIndex {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #dffdf9;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.toolMeta {
+  display: grid;
+  gap: 2px;
+}
+
+.toolMeta strong {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.toolMeta small {
+  color: rgba(255, 230, 208, 0.56);
+  font-size: 11px;
+}
+
+.zoneLabel {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 221, 192, 0.12);
+  background: rgba(13, 11, 10, 0.86);
+  color: #f8ead0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.sceneCaption {
+  display: grid;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 206, 162, 0.12);
+  background: rgba(9, 8, 7, 0.88);
+  box-shadow: 0 12px 24px rgba(5, 3, 2, 0.2);
+  text-align: center;
+}
+
+.sceneCaption strong {
+  color: #fff2dd;
+  font-size: 13px;
+}
+
+.sceneCaption span {
+  color: rgba(255, 228, 203, 0.64);
+  font-size: 11px;
+}
+
+.unitLabel {
+  display: grid;
+  gap: 3px;
+  min-width: 98px;
+  max-width: 140px;
+  padding: 7px 9px;
+  border: 1px solid rgba(255, 206, 162, 0.12);
+  border-radius: 10px;
+  background: rgba(12, 10, 9, 0.9);
+  color: #fff2de;
+  box-shadow: 0 10px 18px rgba(5, 3, 2, 0.24);
+  cursor: pointer;
+  text-align: left;
+  pointer-events: auto;
+}
+
+.unitLabel strong {
+  font-size: 12px;
+  line-height: 1.15;
+}
+
+.unitLabel span {
+  color: rgba(255, 230, 205, 0.62);
+  font-size: 10px;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.unitLabelSelected {
+  border-color: rgba(94, 236, 220, 0.3);
+  box-shadow:
+    inset 0 0 0 1px rgba(94, 236, 220, 0.14),
+    0 12px 22px rgba(5, 3, 2, 0.28);
+}
+
+.unitLabelMuted {
+  opacity: 0.42;
+}
+
+@media (max-width: 1100px) {
+  .stage {
+    min-height: 660px;
+  }
+
+  .sceneHud {
+    width: 172px;
+  }
+
+  .toolDock {
+    width: 136px;
+  }
+}
+
+@media (max-width: 720px) {
+  .stage {
+    min-height: 500px;
+    border-radius: 22px;
+  }
+
+  .sceneHud {
+    left: 12px;
+    top: 12px;
+    width: 152px;
+  }
+
+  .toolDock {
+    right: 12px;
+    bottom: 12px;
+    top: auto;
+    width: auto;
+    grid-auto-flow: column;
+    transform: none;
+  }
+
+  .toolMeta {
+    display: none;
+  }
+
+  .toolButton {
+    padding: 10px;
+  }
+
+  .unitLabel {
+    min-width: 82px;
+    max-width: 104px;
+  }
+
+  .unitLabel span,
+  .sceneCaption span {
+    display: none;
+  }
+}

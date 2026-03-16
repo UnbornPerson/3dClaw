@@ -1,0 +1,34 @@
+{
+  "driver": "openclaw",
+  "defaultEndpoint": "http://localhost:7788",
+  "bindings": {
+    "lobster.alpha": {
+      "label": "Alpha 工作组",
+      "model": "bind-your-alpha-model",
+      "snapshotFile": "data/openclaw/world.json",
+      "operationsPattern": "data/openclaw/operations/*.json",
+      "notes": "将 model 替换成你的工位区模型或代理入口，保留当前 JSON 结构即可。"
+    },
+    "lobster.meeting": {
+      "label": "Meeting 协调模型",
+      "model": "bind-your-meeting-model",
+      "snapshotFile": "data/openclaw/world.json",
+      "operationsPattern": "data/openclaw/operations/*.json",
+      "notes": "适合绑定会议、总结、协同型龙虾代理。"
+    },
+    "lobster.training": {
+      "label": "Training 动作校准模型",
+      "model": "bind-your-training-model",
+      "snapshotFile": "data/openclaw/world.json",
+      "operationsPattern": "data/openclaw/operations/*.json",
+      "notes": "用于姿态恢复、动作评估、健身房训练流程。"
+    },
+    "lobster.ops": {
+      "label": "Ops 重试与排障模型",
+      "model": "bind-your-ops-model",
+      "snapshotFile": "data/openclaw/world.json",
+      "operationsPattern": "data/openclaw/operations/*.json",
+      "notes": "适合故障回放、动作重试、任务文件巡检。"
+    }
+  }
+}
