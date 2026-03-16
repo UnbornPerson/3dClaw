@@ -113,6 +113,8 @@ export default function HomePage({
   const [error, setError] = useState(initialError);
   const [pollIntervalMs, setPollIntervalMs] = useState(initialPollIntervalMs);
   const [sceneAgents, setSceneAgents] = useState<RenderedAgentState[]>([]);
+  const [showAvatarDrawer, setShowAvatarDrawer] = useState(false);
+  const [showSettingsDrawer, setShowSettingsDrawer] = useState(false);
   const animationFrameRef = useRef<number | null>(null);
   const sceneAgentsRef = useRef<RenderedAgentState[]>([]);
 
@@ -344,6 +346,55 @@ export default function HomePage({
         <meta content="width=device-width, initial-scale=1" name="viewport" />
       </Head>
 
+      {/* Avatar Customizer Drawer */}
+      {showAvatarDrawer && (
+        <div className={styles.drawerOverlay} onClick={() => setShowAvatarDrawer(false)}>
+          <div className={styles.drawer} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.drawerHeader}>
+              <h3>人物样式</h3>
+              <button className={styles.drawerClose} onClick={() => setShowAvatarDrawer(false)}>×</button>
+            </div>
+            <AvatarCustomizer
+              agent={selectedAgent}
+              onReset={resetSelectedAgentStyle}
+              onStyleChange={updateSelectedAgentStyle}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Settings Drawer */}
+      {showSettingsDrawer && (
+        <div className={styles.drawerOverlay} onClick={() => setShowSettingsDrawer(false)}>
+          <div className={styles.drawer} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.drawerHeader}>
+              <h3>模型接入配置</h3>
+              <button className={styles.drawerClose} onClick={() => setShowSettingsDrawer(false)}>×</button>
+            </div>
+            <div className={styles.drawerContent}>
+              <div className={styles.bindingGuide}>
+                <div>
+                  <span className={styles.bindingLabel}>世界快照</span>
+                  <code>{snapshot?.bindingGuide.worldFile ?? "data/openclaw/world.json"}</code>
+                </div>
+                <div>
+                  <span className={styles.bindingLabel}>模型映射</span>
+                  <code>{snapshot?.bindingGuide.bindingsFile ?? "data/openclaw/model-bindings.json"}</code>
+                </div>
+                <div>
+                  <span className={styles.bindingLabel}>动作文件</span>
+                  <code>{snapshot?.bindingGuide.operationsDir ?? "data/openclaw/operations"}</code>
+                </div>
+              </div>
+              <p className={styles.helperText}>
+                {snapshot?.bindingGuide.nextStep ?? "把 openclaw 输出映射成当前 JSON 结构即可开始可视化。"}
+              </p>
+              <code className={styles.command}>npm run inspect:openclaw</code>
+            </div>
+          </div>
+        </div>
+      )}
+
       <main className={styles.page}>
         <div className={styles.appShell}>
           <aside className={styles.navRail}>
@@ -436,6 +487,14 @@ export default function HomePage({
                   </strong>
                   <p>高风险动作</p>
                 </article>
+
+                {/* Settings Buttons */}
+                <button className={styles.settingsButton} onClick={() => setShowSettingsDrawer(true)} type="button">
+                  ⚙️ 配置
+                </button>
+                <button className={styles.settingsButton} onClick={() => setShowAvatarDrawer(true)} type="button">
+                  🎨 样式
+                </button>
               </div>
             </header>
 
@@ -506,54 +565,12 @@ export default function HomePage({
               </section>
 
               <aside className={styles.inspectorColumn}>
-                <div className={styles.panelCard}>
-                  <div className={styles.panelHeader}>
-                    <div>
-                      <p className={styles.eyebrow}>Binding</p>
-                      <h2 className={styles.panelTitle}>模型接入</h2>
-                    </div>
-                    <span className={styles.panelHint}>只改绑定即可</span>
-                  </div>
-
-                  <div className={styles.bindingGuide}>
-                    <div>
-                      <span className={styles.bindingLabel}>世界快照</span>
-                      <code>{snapshot?.bindingGuide.worldFile ?? "data/openclaw/world.json"}</code>
-                    </div>
-                    <div>
-                      <span className={styles.bindingLabel}>模型映射</span>
-                      <code>
-                        {snapshot?.bindingGuide.bindingsFile ??
-                          "data/openclaw/model-bindings.json"}
-                      </code>
-                    </div>
-                    <div>
-                      <span className={styles.bindingLabel}>动作文件</span>
-                      <code>
-                        {snapshot?.bindingGuide.operationsDir ??
-                          "data/openclaw/operations"}
-                      </code>
-                    </div>
-                  </div>
-
-                  <p className={styles.helperText}>
-                    {snapshot?.bindingGuide.nextStep ??
-                      "把 openclaw 输出映射成当前 JSON 结构即可开始可视化。"}
-                  </p>
-                  <code className={styles.command}>npm run inspect:openclaw</code>
-                </div>
-
+                {/* Only show ActivityPanel - hidden binding panel */}
                 <ActivityPanel
                   activeRoom={activeRoom}
                   analysis={analysis}
                   operations={operations}
                   selectedAgentId={selectedAgentId}
-                />
-
-                <AvatarCustomizer
-                  agent={selectedAgent}
-                  onReset={resetSelectedAgentStyle}
-                  onStyleChange={updateSelectedAgentStyle}
                 />
               </aside>
             </div>
