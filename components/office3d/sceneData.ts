@@ -58,7 +58,7 @@ const interiorPadding = {
 export const zoneDefinitions: ZoneDefinition[] = [
   {
     room: "meeting",
-    label: "MEETING",
+    label: "",
     center: [-4.8, -3.3],
     size: [8.4, 4.2],
     fill: "#ead6a5",
@@ -66,7 +66,7 @@ export const zoneDefinitions: ZoneDefinition[] = [
   },
   {
     room: "workstations",
-    label: "WORK",
+    label: "",
     center: [-2.6, 1.4],
     size: [11.4, 5.6],
     fill: "#efe2b8",
@@ -74,7 +74,7 @@ export const zoneDefinitions: ZoneDefinition[] = [
   },
   {
     room: "restaurant",
-    label: "LOUNGE",
+    label: "",
     center: [7.1, -2.8],
     size: [5.3, 4.3],
     fill: "#e6d0b1",
@@ -82,7 +82,7 @@ export const zoneDefinitions: ZoneDefinition[] = [
   },
   {
     room: "gym",
-    label: "TRAIN",
+    label: "",
     center: [7.1, 2.8],
     size: [5.2, 4.2],
     fill: "#d6e3b9",
