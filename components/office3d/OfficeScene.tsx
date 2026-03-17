@@ -18,6 +18,21 @@ import {
   zoneDefinitions
 } from "./sceneData";
 import { OfficeUnit } from "./OfficeUnit";
+import { RoundedBoxGeometry } from "three-stdlib";
+
+const geoCylinderPlantBase = new THREE.CylinderGeometry(0.18, 0.24, 0.36, 12);
+const geoSpherePlantTop = new THREE.SphereGeometry(0.34, 18, 18);
+const geoCylinderStoolSeat = new THREE.CylinderGeometry(0.22, 0.24, 0.1, 16);
+const geoCylinderStoolLeg = new THREE.CylinderGeometry(0.06, 0.06, 0.22, 12);
+const geoCylinderTableTop = new THREE.CylinderGeometry(1.75, 1.75, 0.18, 32);
+const geoCylinderTableLeg = new THREE.CylinderGeometry(0.16, 0.2, 0.5, 16);
+// Pre-compute basic standard geometries that share common sizes
+const geoDeskLeg = new THREE.BoxGeometry(0.08, 0.56, 0.08);
+const geoMonitorScreen = new THREE.BoxGeometry(0.5, 0.3, 0.04);
+const geoMonitorStand = new THREE.BoxGeometry(0.04, 0.2, 0.08);
+const geoKeyboard = new THREE.BoxGeometry(0.4, 0.02, 0.14);
+const geoScreenPanel = new THREE.BoxGeometry(1, 1, 1);
+const geoScreenStand = new THREE.BoxGeometry(0.08, 0.45, 0.08);
 
 interface OfficeSceneProps {
   activeRoom: RoomId | "all";
@@ -25,12 +40,14 @@ interface OfficeSceneProps {
   onSelectAgent: (agentId: string) => void;
   rooms: RoomSummary[];
   selectedAgentId: string;
+  firstPersonMode?: boolean;
 }
 
-function SceneControls() {
+function SceneControls({ disabled }: { disabled?: boolean }) {
   const { camera, size } = useThree();
 
   useEffect(() => {
+    if (disabled) return;
     const perspectiveCamera = camera as THREE.PerspectiveCamera;
     const dominant = Math.max(floorSize.width, floorSize.depth);
     const fov = THREE.MathUtils.degToRad(perspectiveCamera.fov);
@@ -41,7 +58,9 @@ function SceneControls() {
     perspectiveCamera.far = 120;
     perspectiveCamera.lookAt(0, 1.2, 0);
     perspectiveCamera.updateProjectionMatrix();
-  }, [camera, size.height, size.width]);
+  }, [camera, size.height, size.width, disabled]);
+
+  if (disabled) return null;
 
   return (
     <OrbitControls
@@ -117,12 +136,10 @@ function Furniture({ activeRoom }: { activeRoom: RoomId | "all" }) {
         if (item.kind === "meetingTable") {
           return (
             <group key={item.id} position={[item.position[0], 0, item.position[1]]}>
-              <mesh castShadow position={[0, 0.46, 0]}>
-                <cylinderGeometry args={[1.75, 1.75, 0.18, 32]} />
+              <mesh castShadow position={[0, 0.46, 0]} geometry={geoCylinderTableTop}>
                 <meshStandardMaterial color={item.color} opacity={opacity} transparent />
               </mesh>
-              <mesh castShadow position={[0, 0.18, 0]}>
-                <cylinderGeometry args={[0.16, 0.2, 0.5, 16]} />
+              <mesh castShadow position={[0, 0.18, 0]} geometry={geoCylinderTableLeg}>
                 <meshStandardMaterial color={item.accent ?? item.color} opacity={opacity} transparent />
               </mesh>
             </group>
@@ -132,16 +149,14 @@ function Furniture({ activeRoom }: { activeRoom: RoomId | "all" }) {
         if (item.kind === "plant") {
           return (
             <group key={item.id} position={[item.position[0], 0, item.position[1]]}>
-              <mesh castShadow position={[0, 0.18, 0]}>
-                <cylinderGeometry args={[0.18, 0.24, 0.36, 12]} />
+              <mesh castShadow position={[0, 0.18, 0]} geometry={geoCylinderPlantBase}>
                 <meshStandardMaterial
                   color={item.accent ?? "#795744"}
                   opacity={opacity}
                   transparent
                 />
               </mesh>
-              <mesh castShadow position={[0, 0.62, 0]}>
-                <sphereGeometry args={[0.34, 18, 18]} />
+              <mesh castShadow position={[0, 0.62, 0]} geometry={geoSpherePlantTop}>
                 <meshStandardMaterial color={item.color} opacity={opacity} transparent />
               </mesh>
             </group>
@@ -151,12 +166,10 @@ function Furniture({ activeRoom }: { activeRoom: RoomId | "all" }) {
         if (item.kind === "stool") {
           return (
             <group key={item.id} position={[item.position[0], 0, item.position[1]]}>
-              <mesh castShadow position={[0, 0.24, 0]}>
-                <cylinderGeometry args={[0.22, 0.24, 0.1, 16]} />
+              <mesh castShadow position={[0, 0.24, 0]} geometry={geoCylinderStoolSeat}>
                 <meshStandardMaterial color={item.color} opacity={opacity} transparent />
               </mesh>
-              <mesh castShadow position={[0, 0.1, 0]}>
-                <cylinderGeometry args={[0.06, 0.06, 0.22, 12]} />
+              <mesh castShadow position={[0, 0.1, 0]} geometry={geoCylinderStoolLeg}>
                 <meshStandardMaterial color="#654029" opacity={opacity} transparent />
               </mesh>
             </group>
@@ -174,11 +187,21 @@ function Furniture({ activeRoom }: { activeRoom: RoomId | "all" }) {
                 <RoundedBox args={[width, height, depth]} castShadow position={[0, 0.54, 0]} radius={0.04}>
                   <meshStandardMaterial color={item.color} opacity={opacity} transparent />
                 </RoundedBox>
+                {/* Monitors and Keyboard */}
+                <mesh castShadow geometry={geoMonitorStand} position={[0, 0.68, -0.1]}>
+                  <meshStandardMaterial color="#2d3748" opacity={opacity} transparent />
+                </mesh>
+                <mesh castShadow geometry={geoMonitorScreen} position={[0, 0.82, -0.06]} rotation={[-0.1, 0, 0]}>
+                  <meshStandardMaterial color="#1a202c" opacity={opacity} transparent />
+                </mesh>
+                <mesh castShadow geometry={geoKeyboard} position={[0, 0.56, 0.18]}>
+                  <meshStandardMaterial color="#4a5568" opacity={opacity} transparent />
+                </mesh>
+                {/* Legs */}
                 {[-0.65, 0.65].map((legX) => (
-                  <mesh castShadow key={`${item.id}-${legX}`} position={[legX, 0.28, 0]}>
-                    <boxGeometry args={[0.08, 0.56, 0.08]} />
+                  <mesh castShadow key={`${item.id}-${legX}`} position={[legX, 0.28, 0]} geometry={geoDeskLeg}>
                     <meshStandardMaterial
-                      color={item.accent ?? "#704a31"}
+                      color={item.accent ?? "#4a5568"}
                       opacity={opacity}
                       transparent
                     />
@@ -200,16 +223,14 @@ function Furniture({ activeRoom }: { activeRoom: RoomId | "all" }) {
             ) : null}
 
             {item.kind === "screen" ? (
-              <>
-                <mesh castShadow position={[0, 0.82, 0]}>
-                  <boxGeometry args={[width, height, depth]} />
-                  <meshStandardMaterial color={item.color} emissive={item.color} emissiveIntensity={0.25} />
+              <group scale={[width, height, depth]}>
+                <mesh castShadow geometry={geoScreenPanel} position={[0, 0.82, 0]}>
+                  <meshStandardMaterial color={item.color} emissive={item.color} emissiveIntensity={0.25} opacity={opacity} transparent />
                 </mesh>
-                <mesh castShadow position={[0, 0.45, 0]}>
-                  <boxGeometry args={[0.08, 0.45, 0.08]} />
+                <mesh castShadow geometry={geoScreenStand} position={[0, 0.45, 0]}>
                   <meshStandardMaterial color={item.accent ?? "#1f2530"} opacity={opacity} transparent />
                 </mesh>
-              </>
+              </group>
             ) : null}
 
             {item.kind === "server" ? (
@@ -294,7 +315,8 @@ function OfficeWorld({
   agents,
   onSelectAgent,
   rooms,
-  selectedAgentId
+  selectedAgentId,
+  firstPersonMode
 }: OfficeSceneProps) {
   const selectedAgent = agents.find((agent) => agent.id === selectedAgentId) ?? agents[0] ?? null;
   const selectedRoomId = selectedAgent?.room ?? null;
@@ -329,7 +351,7 @@ function OfficeWorld({
         shadow-mapSize-width={2048}
       />
 
-      <SceneControls />
+      <SceneControls disabled={firstPersonMode} />
 
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[floorSize.width, floorSize.depth]} />
@@ -382,16 +404,22 @@ function OfficeWorld({
       <Furniture activeRoom={activeRoom} />
       {/* Furniture and Zones */}
 
-      {agents.map((agent) => (
-        <OfficeUnit
-          activeRoom={activeRoom}
-          agent={agent}
-          key={agent.id}
-          onSelect={onSelectAgent}
-          seatAnchor={seatedAssignments.get(agent.id)}
-          selected={agent.id === selectedAgentId}
-        />
-      ))}
+      {agents.map((agent) => {
+        const selected = agent.id === selectedAgentId;
+        const seatAnchor = seatedAssignments.get(agent.id);
+
+        return (
+          <OfficeUnit
+            activeRoom={activeRoom}
+            agent={agent}
+            key={agent.id}
+            onSelect={onSelectAgent}
+            seatAnchor={seatAnchor}
+            selected={selected}
+            firstPersonMode={selected && firstPersonMode}
+          />
+        );
+      })}
 
       {selectedAgent ? (
         <Html center distanceFactor={16} position={[0, floorSize.wallHeight + 0.55, -floorSize.depth / 2 + 0.22]} transform>

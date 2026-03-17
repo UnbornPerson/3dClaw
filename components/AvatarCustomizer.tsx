@@ -1,3 +1,7 @@
+import { Canvas } from "@react-three/fiber";
+import * as THREE from "three";
+import { OrbitControls } from "@react-three/drei";
+import { OfficeUnit } from "./office3d/OfficeUnit";
 import styles from "@/styles/Home.module.css";
 
 import type { Accessory, AgentState, AvatarStyle } from "@/lib/openclaw/types";
@@ -54,6 +58,28 @@ export function AvatarCustomizer({
           <p>{agent.action}</p>
         </div>
         <span className={styles.agentRoom}>{agent.style.label}</span>
+      </div>
+
+      <div style={{ height: 260, borderRadius: 16, border: "1px solid rgba(130, 200, 255, 0.15)", overflow: "hidden", marginBottom: 16, background: "radial-gradient(circle, #101520 0%, #080c12 100%)" }}>
+        <Canvas camera={{ position: [0, 1.2, 4], fov: 45 }} shadows={{ type: THREE.PCFSoftShadowMap }} dpr={[1, 2]} gl={{ antialias: true }}>
+          <ambientLight intensity={1.8} color="#82c8ff" />
+          <hemisphereLight args={["#dcedff", "#404f5e", 1.8]} />
+          <directionalLight castShadow intensity={2.4} position={[5, 12, 8]} color="#ffffff" shadow-mapSize={[1024, 1024]} />
+          <OrbitControls enablePan={false} enableZoom={true} maxDistance={6} minDistance={1} target={[0, 0.6, 0]} />
+          
+          <group position={[0, -0.6, 0]}>
+            <OfficeUnit
+              activeRoom="all"
+              agent={{
+                ...agent,
+                position: { x: 50, y: 50 }, // Force center position just for visual
+              }}
+              onSelect={() => {}}
+              selected={true}
+              hideLabel={true}
+            />
+          </group>
+        </Canvas>
       </div>
 
       <div className={styles.formGrid}>

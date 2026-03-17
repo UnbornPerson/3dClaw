@@ -5,7 +5,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { ActivityPanel } from "@/components/ActivityPanel";
 import { AvatarCustomizer } from "@/components/AvatarCustomizer";
+import { ChatPanel } from "@/components/ChatPanel";
 import { IsometricOffice } from "@/components/IsometricOffice";
+import { MusicPlayer } from "@/components/MusicPlayer";
 import styles from "@/styles/Home.module.css";
 
 import type {
@@ -115,6 +117,9 @@ export default function HomePage({
   const [pollIntervalMs, setPollIntervalMs] = useState(initialPollIntervalMs);
   const [showAvatarDrawer, setShowAvatarDrawer] = useState(false);
   const [showSettingsDrawer, setShowSettingsDrawer] = useState(false);
+  const [firstPersonMode, setFirstPersonMode] = useState(false);
+  const [showMusic, setShowMusic] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -174,7 +179,7 @@ export default function HomePage({
         if (idleAgents.length > 0) {
           const randomAgent = idleAgents[Math.floor(Math.random() * idleAgents.length)];
           const basePos = current[randomAgent.id] ?? randomAgent.position;
-          
+
           next[randomAgent.id] = {
             x: Math.max(0, Math.min(100, basePos.x + (Math.random() - 0.5) * 20)),
             y: Math.max(0, Math.min(100, basePos.y + (Math.random() - 0.5) * 20))
@@ -251,14 +256,14 @@ export default function HomePage({
     () =>
       snapshot
         ? snapshot.agents.map((agent) => ({
-            ...agent,
-            name: nameOverrides[agent.id] ?? agent.name,
-            position: roamingTargets[agent.id] ?? agent.position,
-            style: {
-              ...agent.style,
-              ...(styleOverrides[agent.id] ?? {})
-            }
-          }))
+          ...agent,
+          name: nameOverrides[agent.id] ?? agent.name,
+          position: roamingTargets[agent.id] ?? agent.position,
+          style: {
+            ...agent.style,
+            ...(styleOverrides[agent.id] ?? {})
+          }
+        }))
         : [],
     [snapshot, styleOverrides, nameOverrides, roamingTargets]
   );
@@ -408,9 +413,8 @@ export default function HomePage({
                 <div className={styles.agentStrip}>
                   {agents.map((agent) => (
                     <button
-                      className={`${styles.agentChip} ${
-                        selectedAgentId === agent.id ? styles.agentChipActive : ""
-                      }`}
+                      className={`${styles.agentChip} ${selectedAgentId === agent.id ? styles.agentChipActive : ""
+                        }`}
                       key={agent.id}
                       onClick={() => setSelectedAgentId(agent.id)}
                       style={
@@ -466,6 +470,16 @@ export default function HomePage({
                 <button className={styles.settingsButton} onClick={() => setShowAvatarDrawer(true)} type="button">
                   🎨 样式
                 </button>
+                {selectedAgentId && (
+                  <button 
+                    className={styles.settingsButton} 
+                    onClick={() => setFirstPersonMode(!firstPersonMode)} 
+                    style={{ backgroundColor: firstPersonMode ? "rgba(124, 224, 255, 0.2)" : undefined }}
+                    type="button"
+                  >
+                    👁️ {firstPersonMode ? "退出第一视角" : "第一人称视角"}
+                  </button>
+                )}
               </div>
             </header>
 
@@ -481,9 +495,8 @@ export default function HomePage({
 
                   return (
                     <button
-                      className={`${styles.roomButton} ${
-                        activeRoom === room.id ? styles.roomButtonActive : ""
-                      }`}
+                      className={`${styles.roomButton} ${activeRoom === room.id ? styles.roomButtonActive : ""
+                        }`}
                       key={room.id}
                       onClick={() => setActiveRoom(room.id)}
                       type="button"
@@ -513,9 +526,8 @@ export default function HomePage({
                 <div className={styles.panelHeader}>
                   <div>
                     <p className={styles.eyebrow}>World View</p>
-                    <h2 className={styles.panelTitle}>单体 3D 办公室</h2>
+                    <h2 className={styles.panelTitle}>办公室</h2>
                   </div>
-                  <span className={styles.panelHint}>网页端可部署场景</span>
                 </div>
 
                 <IsometricOffice
@@ -524,6 +536,7 @@ export default function HomePage({
                   onSelectAgent={setSelectedAgentId}
                   rooms={snapshot?.rooms ?? []}
                   selectedAgentId={selectedAgentId}
+                  firstPersonMode={firstPersonMode}
                 />
 
                 <div className={styles.bottomBar}>
@@ -548,6 +561,61 @@ export default function HomePage({
           </div>
         </div>
       </main>
+
+      {/* Floating Action Toolbar */}
+      <div className={styles.actionToolbar}>
+        <button
+          className={`${styles.actionBtn} ${firstPersonMode ? styles.actionBtnActive : ""}`}
+          onClick={() => { setFirstPersonMode(!firstPersonMode); }}
+          type="button"
+        >
+          <span className={styles.actionBtnIcon}>👁️</span>
+          <span className={styles.actionBtnLabel}>跟随视角</span>
+        </button>
+        <button
+          className={`${styles.actionBtn} ${showChat ? styles.actionBtnActive : ""}`}
+          onClick={() => setShowChat(!showChat)}
+          type="button"
+        >
+          <span className={styles.actionBtnIcon}>💬</span>
+          <span className={styles.actionBtnLabel}>对话</span>
+        </button>
+        <button
+          className={`${styles.actionBtn} ${showMusic ? styles.actionBtnActive : ""}`}
+          onClick={() => setShowMusic(!showMusic)}
+          type="button"
+        >
+          <span className={styles.actionBtnIcon}>🎵</span>
+          <span className={styles.actionBtnLabel}>音乐</span>
+        </button>
+        <button
+          className={styles.actionBtn}
+          onClick={() => setShowAvatarDrawer(true)}
+          type="button"
+        >
+          <span className={styles.actionBtnIcon}>🎨</span>
+          <span className={styles.actionBtnLabel}>样式</span>
+        </button>
+        <button
+          className={styles.actionBtn}
+          onClick={() => setShowSettingsDrawer(true)}
+          type="button"
+        >
+          <span className={styles.actionBtnIcon}>⚙️</span>
+          <span className={styles.actionBtnLabel}>配置</span>
+        </button>
+      </div>
+
+      {/* Music Player */}
+      <MusicPlayer open={showMusic} onClose={() => setShowMusic(false)} />
+
+      {/* Chat Panel */}
+      <ChatPanel
+        open={showChat}
+        onClose={() => setShowChat(false)}
+        agents={agents}
+        selectedAgentId={selectedAgentId}
+      />
     </>
   );
 }

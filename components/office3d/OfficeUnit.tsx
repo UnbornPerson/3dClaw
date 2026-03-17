@@ -1,7 +1,8 @@
-import { Html, Line, RoundedBox } from "@react-three/drei";
+import { Html, Line } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
+import { RoundedBoxGeometry } from "three-stdlib";
 
 import styles from "@/styles/Office.module.css";
 
@@ -14,11 +15,27 @@ import {
   toFloorPosition
 } from "./sceneData";
 
+const geoShadow = new THREE.CircleGeometry(0.36, 24);
+const geoRing = new THREE.TorusGeometry(0.5, 0.04, 12, 32);
+
+// Cute Pill-like shapes
+const geoHead = new RoundedBoxGeometry(0.44, 0.4, 0.44, 4, 0.12);
+const geoVisor = new RoundedBoxGeometry(0.12, 0.2, 0.42, 4, 0.06); 
+const geoEar = new THREE.CylinderGeometry(0.08, 0.08, 0.06, 24);
+const geoTorso = new THREE.CapsuleGeometry(0.2, 0.3, 4, 16); 
+const geoCollar = new THREE.CylinderGeometry(0.12, 0.14, 0.08, 24);
+const geoArm = new THREE.CapsuleGeometry(0.07, 0.25, 4, 16);
+const geoHand = new THREE.SphereGeometry(0.08, 16, 16);
+const geoLeg = new THREE.CapsuleGeometry(0.08, 0.2, 4, 16);
+const geoFoot = new THREE.CapsuleGeometry(0.08, 0.12, 4, 16);
+
 interface OfficeUnitProps {
   activeRoom: RoomId | "all";
   agent: AgentState;
   selected: boolean;
   seatAnchor?: SeatAnchor;
+  hideLabel?: boolean;
+  firstPersonMode?: boolean;
   onSelect: (agentId: string) => void;
 }
 
@@ -27,6 +44,8 @@ export function OfficeUnit({
   agent,
   selected,
   seatAnchor,
+  hideLabel,
+  firstPersonMode,
   onSelect
 }: OfficeUnitProps) {
   const bodyRef = useRef<THREE.Group>(null);
@@ -51,7 +70,7 @@ export function OfficeUnit({
     // Determine movement target
     const targetX = agent.position.x;
     const targetY = agent.position.y;
-    const speed = 2.0;
+    const speed = 25.0;
 
     const dx = targetX - visualPosition.current.x;
     const dy = targetY - visualPosition.current.y;
@@ -97,13 +116,13 @@ export function OfficeUnit({
     const walkSwing = isMovingRef.current && !isSeated ? Math.sin(time * 8) * 0.6 : 0;
 
     if (bodyRef.current) {
-      const bob = isMovingRef.current && !isSeated ? Math.sin(time * 8) * 0.06 : 0;
-      bodyRef.current.position.y = isSeated ? 0.12 : 0.3 + bob;
+      const bob = isMovingRef.current && !isSeated ? Math.sin(time * 8) * 0.04 : 0;
+      bodyRef.current.position.y = isSeated ? 0.08 : 0.32 + bob;
     }
 
     if (torsoRef.current) {
-      torsoRef.current.rotation.z = isSeated ? -0.18 : 0;
-      torsoRef.current.position.y = isSeated ? -0.08 : 0;
+      torsoRef.current.rotation.z = isSeated ? -0.12 : 0;
+      torsoRef.current.position.y = isSeated ? -0.05 : 0;
     }
 
     if (headRef.current) {
@@ -118,10 +137,10 @@ export function OfficeUnit({
 
     if (leftArmRef.current && rightArmRef.current) {
       if (isSeated) {
-        leftArmRef.current.rotation.z = -1.05;
-        rightArmRef.current.rotation.z = -1.12;
-        leftArmRef.current.rotation.x = 0.2 + Math.sin(time * 18) * 0.12;
-        rightArmRef.current.rotation.x = -0.15 + Math.cos(time * 18) * 0.12;
+        leftArmRef.current.rotation.z = 1.05;
+        rightArmRef.current.rotation.z = 1.05;
+        leftArmRef.current.rotation.x = 0.4 + Math.sin(time * 24) * 0.3;
+        rightArmRef.current.rotation.x = -0.4 - Math.cos(time * 24) * 0.3;
       } else {
         leftArmRef.current.rotation.z = walkSwing;
         rightArmRef.current.rotation.z = -walkSwing;
@@ -132,20 +151,45 @@ export function OfficeUnit({
 
     if (leftLegRef.current && rightLegRef.current) {
       if (isSeated) {
-        leftLegRef.current.rotation.z = -1.38;
-        rightLegRef.current.rotation.z = -1.38;
-        leftLegRef.current.position.set(-0.15, -0.18, 0.14);
-        rightLegRef.current.position.set(0.15, -0.18, -0.14);
+        leftLegRef.current.rotation.z = 1.35;
+        rightLegRef.current.rotation.z = 1.35;
+        leftLegRef.current.position.set(0.12, 0.05, 0.1);
+        rightLegRef.current.position.set(0.12, 0.05, -0.1);
       } else {
-        leftLegRef.current.rotation.z = -walkSwing * 0.7;
-        rightLegRef.current.rotation.z = walkSwing * 0.7;
-        leftLegRef.current.position.set(-0.15, -0.12, 0);
-        rightLegRef.current.position.set(0.15, -0.12, 0);
+        leftLegRef.current.rotation.z = -walkSwing * 0.8;
+        rightLegRef.current.rotation.z = walkSwing * 0.8;
+        leftLegRef.current.position.set(0, 0.05, 0.1);
+        rightLegRef.current.position.set(0, 0.05, -0.1);
       }
     }
 
     if (ringRef.current) {
       ringRef.current.rotation.z += 0.02;
+    }
+
+    // First person view camera binding
+    if (firstPersonMode && selected && headRef.current && bodyRef.current) {
+      const headPos = new THREE.Vector3();
+      headRef.current.getWorldPosition(headPos);
+
+      const bodyForward = new THREE.Vector3(0, 0, 1);
+      bodyRef.current.getWorldDirection(bodyForward);
+
+      // Camera sits right at eye level
+      const eyePos = headPos.clone().add(new THREE.Vector3(0, 0.4, 0)); 
+      
+      // Interpolate camera to the eye position
+      state.camera.position.lerp(eyePos, 0.2);
+
+      // Determine look-at target
+      const lookTarget = eyePos.clone().add(bodyForward.multiplyScalar(5));
+      if (isSeated) {
+        lookTarget.y -= 1.0; 
+      } else {
+        lookTarget.y -= 0.2; 
+      }
+      
+      state.camera.lookAt(lookTarget);
     }
   });
 
@@ -153,14 +197,12 @@ export function OfficeUnit({
 
   return (
     <group ref={baseGroupRef}>
-      <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[0.48, 24]} />
+      <mesh geometry={geoShadow} position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <meshBasicMaterial color="#150b07" opacity={0.22 * baseOpacity} transparent />
       </mesh>
 
       {selected ? (
-        <mesh ref={ringRef} position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[0.66, 0.04, 12, 32]} />
+        <mesh ref={ringRef} geometry={geoRing} position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <meshBasicMaterial color={agent.style.accent} opacity={0.95} transparent />
         </mesh>
       ) : null}
@@ -171,96 +213,77 @@ export function OfficeUnit({
         onPointerDown={(event) => event.stopPropagation()}
       >
         <group ref={torsoRef}>
-          <RoundedBox
-            args={[0.52, 0.74, 0.34]}
-            castShadow
-            position={[0, 0.46, 0]}
-            radius={0.05}
-          >
-            <meshStandardMaterial color={agent.style.body} opacity={baseOpacity} transparent />
-          </RoundedBox>
+          {/* Main Torso */}
+          <mesh geometry={geoTorso} castShadow position={[0, 0.35, 0]}>
+            <meshStandardMaterial color={agent.style.body} opacity={baseOpacity} roughness={0.2} metalness={0.1} transparent />
+          </mesh>
 
-          <RoundedBox
-            args={[0.44, 0.18, 0.2]}
-            castShadow
-            position={[0.02, 0.82, 0.02]}
-            radius={0.04}
-          >
-            <meshStandardMaterial color={agent.style.accent} opacity={baseOpacity} transparent />
-          </RoundedBox>
+          {/* Collar/Neck */}
+          <mesh geometry={geoCollar} castShadow position={[0, 0.65, 0]}>
+            <meshStandardMaterial color={agent.style.accent} opacity={baseOpacity} roughness={0.4} metalness={0.2} transparent />
+          </mesh>
 
-          <group ref={headRef} position={[0, 1.16, 0]}>
-            <RoundedBox args={[0.48, 0.5, 0.46]} castShadow radius={0.08}>
-              <meshStandardMaterial color={agent.style.skin} opacity={baseOpacity} transparent />
-            </RoundedBox>
+          {/* Head Group */}
+          <group ref={headRef} position={[0, 0.9, 0]}>
+             <mesh geometry={geoHead} castShadow>
+               <meshStandardMaterial color={agent.style.skin} opacity={baseOpacity} roughness={0.3} metalness={0.1} transparent />
+             </mesh>
+             {/* Glowing Visor */}
+             <mesh geometry={geoVisor} castShadow position={[0.22, 0, 0]}>
+               <meshStandardMaterial color="#cffafe" emissive="#0ea5e9" emissiveIntensity={1.2} roughness={0.1} metalness={0.6} opacity={0.9 * baseOpacity} transparent />
+             </mesh>
+             {/* Headphones (Ears) */}
+             <mesh geometry={geoEar} castShadow position={[0, 0, 0.24]} rotation={[Math.PI/2, 0, 0]}>
+               <meshStandardMaterial color={agent.style.accent} opacity={baseOpacity} roughness={0.3} metalness={0.5} transparent />
+             </mesh>
+             <mesh geometry={geoEar} castShadow position={[0, 0, -0.24]} rotation={[Math.PI/2, 0, 0]}>
+               <meshStandardMaterial color={agent.style.accent} opacity={baseOpacity} roughness={0.3} metalness={0.5} transparent />
+             </mesh>
+          </group>
 
-            <RoundedBox args={[0.52, 0.12, 0.5]} castShadow position={[0, 0.26, 0]} radius={0.04}>
-              <meshStandardMaterial color="#2d3748" opacity={baseOpacity} transparent />
-            </RoundedBox>
-
-            <RoundedBox args={[0.38, 0.14, 0.1]} castShadow position={[-0.08, 0.02, 0.24]} radius={0.04}>
-              <meshStandardMaterial color="#7ce0ff" emissive="#7ce0ff" emissiveIntensity={0.5} opacity={0.9 * baseOpacity} transparent />
-            </RoundedBox>
-
-            <mesh castShadow position={[0.14, -0.14, 0.16]}>
-              <boxGeometry args={[0.18, 0.04, 0.18]} />
-              <meshStandardMaterial color="#1a202c" opacity={0.82 * baseOpacity} transparent />
+          {/* Left Arm */}
+          <group ref={leftArmRef} position={[0, 0.5, 0.26]}>
+            <mesh geometry={geoArm} castShadow position={[0, -0.15, 0]}>
+              <meshStandardMaterial color={agent.style.body} opacity={baseOpacity} roughness={0.2} metalness={0.1} transparent />
             </mesh>
-
-            <mesh castShadow position={[0.16, 0.36, 0.11]} rotation={[0.1, 0, 0.22]}>
-              <boxGeometry args={[0.04, 0.24, 0.04]} />
-              <meshStandardMaterial color={agent.style.accent} opacity={baseOpacity} transparent />
-            </mesh>
-
-            <mesh castShadow position={[0.16, 0.36, -0.11]} rotation={[-0.1, 0, 0.22]}>
-              <boxGeometry args={[0.04, 0.24, 0.04]} />
-              <meshStandardMaterial color={agent.style.accent} opacity={baseOpacity} transparent />
+            <mesh geometry={geoHand} castShadow position={[0, -0.32, 0]}>
+              <meshStandardMaterial color={agent.style.skin} opacity={baseOpacity} roughness={0.3} metalness={0.1} transparent />
             </mesh>
           </group>
 
-          <group ref={leftArmRef} position={[-0.34, 0.72, 0.24]}>
-            <RoundedBox args={[0.16, 0.5, 0.16]} castShadow position={[0, -0.22, 0]} radius={0.06}>
-              <meshStandardMaterial color={agent.style.body} opacity={baseOpacity} transparent />
-            </RoundedBox>
-            <RoundedBox args={[0.14, 0.18, 0.14]} castShadow position={[0, -0.48, 0]} radius={0.04}>
-              <meshStandardMaterial color={agent.style.skin} opacity={baseOpacity} transparent />
-            </RoundedBox>
-          </group>
-
-          <group ref={rightArmRef} position={[-0.34, 0.72, -0.24]}>
-            <RoundedBox args={[0.16, 0.5, 0.16]} castShadow position={[0, -0.22, 0]} radius={0.06}>
-              <meshStandardMaterial color={agent.style.body} opacity={baseOpacity} transparent />
-            </RoundedBox>
-            <RoundedBox args={[0.14, 0.18, 0.14]} castShadow position={[0, -0.48, 0]} radius={0.04}>
-              <meshStandardMaterial color={agent.style.skin} opacity={baseOpacity} transparent />
-            </RoundedBox>
-          </group>
-
-          <group ref={leftLegRef} position={[-0.15, -0.12, 0]}>
-            <mesh castShadow position={[0, -0.28, 0]}>
-              <boxGeometry args={[0.18, 0.56, 0.18]} />
-              <meshStandardMaterial color="#1f2640" opacity={baseOpacity} transparent />
+          {/* Right Arm */}
+          <group ref={rightArmRef} position={[0, 0.5, -0.26]}>
+            <mesh geometry={geoArm} castShadow position={[0, -0.15, 0]}>
+              <meshStandardMaterial color={agent.style.body} opacity={baseOpacity} roughness={0.2} metalness={0.1} transparent />
             </mesh>
-            <mesh castShadow position={[0, -0.59, 0.01]}>
-              <boxGeometry args={[0.2, 0.1, 0.28]} />
-              <meshStandardMaterial color="#15110f" opacity={baseOpacity} transparent />
+            <mesh geometry={geoHand} castShadow position={[0, -0.32, 0]}>
+              <meshStandardMaterial color={agent.style.skin} opacity={baseOpacity} roughness={0.3} metalness={0.1} transparent />
             </mesh>
           </group>
 
-          <group ref={rightLegRef} position={[0.15, -0.12, 0]}>
-            <mesh castShadow position={[0, -0.28, 0]}>
-              <boxGeometry args={[0.18, 0.56, 0.18]} />
-              <meshStandardMaterial color="#1f2640" opacity={baseOpacity} transparent />
+          {/* Left Leg */}
+          <group ref={leftLegRef} position={[0, 0.05, 0.1]}>
+            <mesh geometry={geoLeg} castShadow position={[0, -0.1, 0]}>
+               <meshStandardMaterial color="#1e293b" opacity={baseOpacity} roughness={0.5} transparent />
             </mesh>
-            <mesh castShadow position={[0, -0.59, 0.01]}>
-              <boxGeometry args={[0.2, 0.1, 0.28]} />
-              <meshStandardMaterial color="#15110f" opacity={baseOpacity} transparent />
+            <mesh geometry={geoFoot} castShadow position={[0.04, -0.24, 0]} rotation={[0, 0, Math.PI/2]}>
+               <meshStandardMaterial color="#0f172a" opacity={baseOpacity} roughness={0.5} transparent />
+            </mesh>
+          </group>
+
+          {/* Right Leg */}
+          <group ref={rightLegRef} position={[0, 0.05, -0.1]}>
+            <mesh geometry={geoLeg} castShadow position={[0, -0.1, 0]}>
+               <meshStandardMaterial color="#1e293b" opacity={baseOpacity} roughness={0.5} transparent />
+            </mesh>
+            <mesh geometry={geoFoot} castShadow position={[0.04, -0.24, 0]} rotation={[0, 0, Math.PI/2]}>
+               <meshStandardMaterial color="#0f172a" opacity={baseOpacity} roughness={0.5} transparent />
             </mesh>
           </group>
         </group>
       </group>
 
-      {(selected || shouldShowLabel) ? (
+      {!hideLabel && (selected || shouldShowLabel) ? (
         <Html center distanceFactor={11} position={[0.14, Boolean(seatAnchor) && !isMovingRef.current ? 1.44 : 1.86, 0]} sprite transform>
           <button
             className={`${styles.unitLabel} ${selected ? styles.unitLabelSelected : ""} ${

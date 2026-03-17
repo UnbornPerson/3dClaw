@@ -11,6 +11,7 @@ interface IsometricOfficeProps {
   agents: AgentState[];
   activeRoom: RoomId | "all";
   selectedAgentId: string;
+  firstPersonMode?: boolean;
   onSelectAgent: (agentId: string) => void;
 }
 
@@ -27,6 +28,7 @@ export function IsometricOffice({
   agents,
   activeRoom,
   selectedAgentId,
+  firstPersonMode,
   onSelectAgent
 }: IsometricOfficeProps) {
   const selectedAgent = agents.find((agent) => agent.id === selectedAgentId) ?? agents[0] ?? null;
@@ -49,6 +51,7 @@ export function IsometricOffice({
           onSelectAgent={onSelectAgent}
           rooms={rooms}
           selectedAgentId={selectedAgentId}
+          firstPersonMode={firstPersonMode}
         />
       </div>
 
