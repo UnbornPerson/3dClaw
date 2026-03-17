@@ -28,11 +28,13 @@ const geoCylinderTableTop = new THREE.CylinderGeometry(1.75, 1.75, 0.18, 32);
 const geoCylinderTableLeg = new THREE.CylinderGeometry(0.16, 0.2, 0.5, 16);
 // Pre-compute basic standard geometries that share common sizes
 const geoDeskLeg = new THREE.BoxGeometry(0.08, 0.56, 0.08);
-const geoMonitorScreen = new THREE.BoxGeometry(0.5, 0.3, 0.04);
-const geoMonitorStand = new THREE.BoxGeometry(0.04, 0.2, 0.08);
-const geoKeyboard = new THREE.BoxGeometry(0.4, 0.02, 0.14);
+const geoMonitorScreen = new THREE.BoxGeometry(0.7, 0.42, 0.04);
+const geoMonitorStand = new THREE.BoxGeometry(0.06, 0.22, 0.1);
+const geoKeyboard = new THREE.BoxGeometry(0.5, 0.02, 0.18);
 const geoScreenPanel = new THREE.BoxGeometry(1, 1, 1);
 const geoScreenStand = new THREE.BoxGeometry(0.08, 0.45, 0.08);
+const geoChairLeg = new THREE.CylinderGeometry(0.03, 0.03, 0.3, 8);
+const geoChairArmrest = new THREE.BoxGeometry(0.06, 0.04, 0.35);
 
 interface OfficeSceneProps {
   activeRoom: RoomId | "all";
@@ -112,9 +114,11 @@ function RoomZone({
         transparent
       />
 
-      <Html center distanceFactor={18} position={[zone.center[0], 0.24, zone.center[1]]} sprite transform>
-        <div className={styles.zoneLabel}>{zone.label}</div>
-      </Html>
+      {zone.label ? (
+        <Html center distanceFactor={18} position={[zone.center[0], 0.24, zone.center[1]]} sprite transform>
+          <div className={styles.zoneLabel}>{zone.label}</div>
+        </Html>
+      ) : null}
 
       {selected ? (
         <mesh position={[anchorX, anchorY + 0.02, anchorZ]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -149,16 +153,26 @@ function Furniture({ activeRoom }: { activeRoom: RoomId | "all" }) {
         if (item.kind === "plant") {
           return (
             <group key={item.id} position={[item.position[0], 0, item.position[1]]}>
-              <mesh castShadow position={[0, 0.18, 0]} geometry={geoCylinderPlantBase}>
-                <meshStandardMaterial
-                  color={item.accent ?? "#795744"}
-                  opacity={opacity}
-                  transparent
-                />
+              {/* Pot */}
+              <mesh castShadow position={[0, 0.25, 0]}>
+                <cylinderGeometry args={[0.3, 0.25, 0.5, 12]} />
+                <meshStandardMaterial color="#444" opacity={opacity} transparent roughness={0.5} />
               </mesh>
-              <mesh castShadow position={[0, 0.62, 0]} geometry={geoSpherePlantTop}>
-                <meshStandardMaterial color={item.color} opacity={opacity} transparent />
-              </mesh>
+              {/* Leaves/Plant Top */}
+              <group position={[0, 0.5, 0]}>
+                <mesh castShadow position={[0, 0.3, 0]}>
+                  <sphereGeometry args={[0.3, 12, 12]} />
+                  <meshStandardMaterial color={item.color} opacity={opacity} transparent />
+                </mesh>
+                <mesh castShadow position={[0.2, 0.5, 0.1]} scale={[0.8, 0.8, 0.8]}>
+                  <sphereGeometry args={[0.25, 12, 12]} />
+                  <meshStandardMaterial color={item.accent ?? "#4caf50"} opacity={opacity} transparent />
+                </mesh>
+                <mesh castShadow position={[-0.15, 0.45, -0.2]} scale={[0.7, 0.7, 0.7]}>
+                  <sphereGeometry args={[0.25, 12, 12]} />
+                  <meshStandardMaterial color={item.accent ?? "#4caf50"} opacity={opacity} transparent />
+                </mesh>
+              </group>
             </group>
           );
         }
@@ -194,9 +208,22 @@ function Furniture({ activeRoom }: { activeRoom: RoomId | "all" }) {
                 <mesh castShadow geometry={geoMonitorScreen} position={[0, 0.82, -0.06]} rotation={[-0.1, 0, 0]}>
                   <meshStandardMaterial color="#1a202c" opacity={opacity} transparent />
                 </mesh>
-                <mesh castShadow geometry={geoKeyboard} position={[0, 0.56, 0.18]}>
+                <mesh castShadow geometry={geoKeyboard} position={[0, 0.57, 0.18]}>
                   <meshStandardMaterial color="#4a5568" opacity={opacity} transparent />
                 </mesh>
+                {/* Desktop Detail: Mug (Variety) */}
+                {parseInt(item.id.split("-").pop() || "0") % 3 === 0 && (
+                  <group position={[0.3, 0.56 + 0.06, 0.08]}>
+                    <mesh castShadow>
+                      <cylinderGeometry args={[0.04, 0.035, 0.12, 12]} />
+                      <meshStandardMaterial color="#ef4444" opacity={opacity} transparent roughness={0.3} />
+                    </mesh>
+                    <mesh position={[0.045, 0, 0]} rotation={[0, 0, Math.PI/2]}>
+                      <torusGeometry args={[0.025, 0.008, 8, 16, Math.PI]} />
+                      <meshStandardMaterial color="#ef4444" opacity={opacity} transparent />
+                    </mesh>
+                  </group>
+                )}
                 {/* Legs */}
                 {[-0.65, 0.65].map((legX) => (
                   <mesh castShadow key={`${item.id}-${legX}`} position={[legX, 0.28, 0]} geometry={geoDeskLeg}>
@@ -212,56 +239,113 @@ function Furniture({ activeRoom }: { activeRoom: RoomId | "all" }) {
 
             {item.kind === "chair" ? (
               <>
-                <RoundedBox args={[width, 0.14, depth]} castShadow position={[0, 0.34, 0]} radius={0.04}>
+                {/* Seat */}
+                <RoundedBox args={[width, 0.1, depth]} castShadow position={[0, 0.38, 0]} radius={0.04}>
                   <meshStandardMaterial color={item.color} opacity={opacity} transparent />
                 </RoundedBox>
-                <mesh castShadow position={[0, 0.65, -0.18]}>
-                  <boxGeometry args={[width, 0.5, 0.1]} />
+                {/* Backrest — positioned on the far side from desk */}
+                <RoundedBox args={[width, 0.42, 0.08]} castShadow position={[0, 0.62, depth / 2 - 0.04]} radius={0.03}>
+                  <meshStandardMaterial color={item.accent ?? item.color} opacity={opacity} transparent />
+                </RoundedBox>
+                {/* 5 Star Base Legs */}
+                {[0, 1, 2, 3, 4].map((i) => {
+                  const angle = (i / 5) * Math.PI * 2;
+                  return (
+                    <mesh castShadow geometry={geoChairLeg} key={`${item.id}-leg-${i}`}
+                      position={[Math.sin(angle) * 0.2, 0.15, Math.cos(angle) * 0.2]}>
+                      <meshStandardMaterial color="#3a3a3a" opacity={opacity} transparent />
+                    </mesh>
+                  );
+                })}
+                {/* Central post */}
+                <mesh castShadow position={[0, 0.25, 0]}>
+                  <cylinderGeometry args={[0.04, 0.04, 0.2, 8]} />
+                  <meshStandardMaterial color="#555" opacity={opacity} transparent />
+                </mesh>
+                {/* Armrests */}
+                <mesh castShadow geometry={geoChairArmrest} position={[-width / 2 + 0.04, 0.52, -0.04]}>
+                  <meshStandardMaterial color={item.accent ?? item.color} opacity={opacity} transparent />
+                </mesh>
+                <mesh castShadow geometry={geoChairArmrest} position={[width / 2 - 0.04, 0.52, -0.04]}>
                   <meshStandardMaterial color={item.accent ?? item.color} opacity={opacity} transparent />
                 </mesh>
               </>
             ) : null}
 
             {item.kind === "screen" ? (
-              <group scale={[width, height, depth]}>
-                <mesh castShadow geometry={geoScreenPanel} position={[0, 0.82, 0]}>
-                  <meshStandardMaterial color={item.color} emissive={item.color} emissiveIntensity={0.25} opacity={opacity} transparent />
+              <group position={[0, 0, 0]}>
+                {/* Bookcase Main Body */}
+                <RoundedBox args={[width, height, depth]} castShadow position={[0, height / 2, 0]} radius={0.02}>
+                  <meshStandardMaterial color={item.color} opacity={opacity} transparent />
+                </RoundedBox>
+                {/* Bookcase Side Panels */}
+                <mesh position={[width / 2 - 0.02, height / 2, 0]}>
+                  <boxGeometry args={[0.04, height, depth + 0.01]} />
+                  <meshStandardMaterial color={item.accent ?? "#222"} opacity={opacity} transparent />
                 </mesh>
-                <mesh castShadow geometry={geoScreenStand} position={[0, 0.45, 0]}>
-                  <meshStandardMaterial color={item.accent ?? "#1f2530"} opacity={opacity} transparent />
+                <mesh position={[-width / 2 + 0.02, height / 2, 0]}>
+                  <boxGeometry args={[0.04, height, depth + 0.01]} />
+                  <meshStandardMaterial color={item.accent ?? "#222"} opacity={opacity} transparent />
                 </mesh>
+                {/* Horizontal Shelves */}
+                {[0.25, 0.45, 0.65, 0.85].map((y) => (
+                  <mesh key={`${item.id}-shelf-${y}`} position={[0, height * y, 0.02]}>
+                    <boxGeometry args={[width * 0.9, 0.03, depth * 0.8]} />
+                    <meshStandardMaterial color={item.accent ?? "#333"} opacity={opacity} transparent />
+                  </mesh>
+                ))}
               </group>
             ) : null}
 
             {item.kind === "server" ? (
-              <>
+              <group position={[0, 0, 0]}>
                 <RoundedBox args={[width, height, depth]} castShadow position={[0, height / 2, 0]} radius={0.06}>
-                  <meshStandardMaterial color={item.color} opacity={opacity} transparent />
+                  <meshStandardMaterial color={item.color} opacity={opacity} transparent metalness={0.6} roughness={0.2} />
                 </RoundedBox>
-                {[0.45, 0.95, 1.45, 1.95].map((y) => (
-                  <mesh key={`${item.id}-${y}`} position={[width / 2 + 0.01, y, 0]}>
-                    <boxGeometry args={[0.02, 0.08, 0.58]} />
-                    <meshBasicMaterial color={item.accent ?? "#84ddd2"} opacity={0.88 * opacity} transparent />
+                {/* Front Panel Grid */}
+                <mesh position={[0, height / 2, depth / 2 + 0.01]}>
+                  <boxGeometry args={[width * 0.8, height * 0.9, 0.02]} />
+                  <meshStandardMaterial color="#111" opacity={opacity} transparent />
+                </mesh>
+                {/* Status LEDs - with offset to prevent z-fighting */}
+                {[0.3, 0.4, 0.5, 0.6, 0.7, 0.8].map((y, i) => (
+                  <mesh key={`${item.id}-led-${i}`} position={[width * 0.25, height * y, depth / 2 + 0.035]}>
+                    <sphereGeometry args={[0.02, 8, 8]} />
+                    <meshStandardMaterial 
+                      color={i % 2 === 0 ? "#00ff66" : "#ffcc00"} 
+                      emissive={i % 2 === 0 ? "#00ff66" : "#ffcc00"} 
+                      emissiveIntensity={0.8}
+                      polygonOffset
+                      polygonOffsetFactor={-1}
+                    />
                   </mesh>
                 ))}
-              </>
+              </group>
             ) : null}
 
             {item.kind === "sofa" ? (
-              <>
-                <RoundedBox args={[width - 0.2, 0.4, depth]} castShadow position={[0, 0.2, 0]} radius={0.1}>
+              <group>
+                <RoundedBox args={[width - 0.2, 0.45, depth]} castShadow position={[0, 0.22, 0]} radius={0.12}>
                   <meshStandardMaterial color={item.color} opacity={opacity} transparent />
                 </RoundedBox>
-                <RoundedBox args={[width, 0.6, 0.3]} castShadow position={[0, 0.6, -depth / 2 + 0.15]} radius={0.15}>
+                <RoundedBox args={[width, 0.55, 0.3]} castShadow position={[0, 0.5, -depth / 2 + 0.15]} radius={0.15}>
                   <meshStandardMaterial color={item.accent ?? item.color} opacity={opacity} transparent />
                 </RoundedBox>
-                <RoundedBox args={[0.25, 0.5, depth]} castShadow position={[-width / 2 + 0.125, 0.35, 0]} radius={0.1}>
+                {/* Armrests */}
+                <RoundedBox args={[0.25, 0.45, depth]} castShadow position={[-width / 2 + 0.125, 0.35, 0]} radius={0.1}>
                   <meshStandardMaterial color={item.accent ?? item.color} opacity={opacity} transparent />
                 </RoundedBox>
-                <RoundedBox args={[0.25, 0.5, depth]} castShadow position={[width / 2 - 0.125, 0.35, 0]} radius={0.1}>
+                <RoundedBox args={[0.25, 0.45, depth]} castShadow position={[width / 2 - 0.125, 0.35, 0]} radius={0.1}>
                   <meshStandardMaterial color={item.accent ?? item.color} opacity={opacity} transparent />
                 </RoundedBox>
-              </>
+                {/* Cushions */}
+                <RoundedBox args={[(width - 0.6) / 2, 0.12, depth * 0.8]} position={[-width/4, 0.46, 0.05]} radius={0.05}>
+                  <meshStandardMaterial color={item.color} opacity={opacity} transparent />
+                </RoundedBox>
+                <RoundedBox args={[(width - 0.6) / 2, 0.12, depth * 0.8]} position={[width/4, 0.46, 0.05]} radius={0.05}>
+                  <meshStandardMaterial color={item.color} opacity={opacity} transparent />
+                </RoundedBox>
+              </group>
             ) : null}
 
             {item.kind === "counter" ? (
@@ -271,10 +355,27 @@ function Furniture({ activeRoom }: { activeRoom: RoomId | "all" }) {
             ) : null}
 
             {item.kind === "divider" ? (
-              <mesh castShadow position={[0, height / 2, 0]}>
-                <boxGeometry args={[width, height, depth]} />
-                <meshStandardMaterial color={item.color} opacity={0.8 * opacity} transparent />
-              </mesh>
+              <group position={[0, height / 2, 0]}>
+                <mesh castShadow>
+                  <boxGeometry args={[width, height, depth]} />
+                  <meshStandardMaterial 
+                    color={item.color} 
+                    opacity={0.35 * opacity} 
+                    transparent 
+                    metalness={0.2} 
+                    roughness={0.1}
+                  />
+                </mesh>
+                {/* Top/Bottom Rails */}
+                <mesh position={[0, height / 2 - 0.02, 0]}>
+                  <boxGeometry args={[width + 0.02, 0.04, depth + 0.02]} />
+                  <meshStandardMaterial color="#444" opacity={opacity} transparent />
+                </mesh>
+                <mesh position={[0, -height / 2 + 0.02, 0]}>
+                  <boxGeometry args={[width + 0.02, 0.04, depth + 0.02]} />
+                  <meshStandardMaterial color="#444" opacity={opacity} transparent />
+                </mesh>
+              </group>
             ) : null}
 
             {item.kind === "locker" ? (
@@ -338,51 +439,76 @@ function OfficeWorld({
 
   return (
     <>
-      <color args={["#08101a"]} attach="background" />
-      <fog args={["#08101a", 18, 38]} attach="fog" />
+      <color args={["#0c1524"]} attach="background" />
+      <fog args={["#0c1524", 22, 45]} attach="fog" />
 
-      <ambientLight intensity={1.2} color="#82c8ff" />
-      <hemisphereLight args={["#dcedff", "#404f5e", 1.8]} />
+      <ambientLight intensity={2.2} color="#b0d8ff" />
+      <hemisphereLight args={["#e8f4ff", "#5a6878", 2.8]} />
       <directionalLight
         castShadow
-        intensity={1.6}
-        position={[10, 14, 7]}
+        intensity={2.4}
+        position={[10, 16, 8]}
         shadow-mapSize-height={2048}
         shadow-mapSize-width={2048}
+        shadow-bias={-0.001}
       />
+      <directionalLight intensity={0.8} position={[-6, 8, -4]} />
+      <pointLight color="#ffe4c4" intensity={0.6} position={[0, 4, 0]} />
 
       <SceneControls disabled={firstPersonMode} />
 
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
         <planeGeometry args={[floorSize.width, floorSize.depth]} />
-        <meshStandardMaterial color="#f3e7c2" />
+        <meshStandardMaterial color="#f8f9fb" roughness={0.8} />
       </mesh>
 
       <Grid
         args={[floorSize.width, floorSize.depth]}
-        cellColor="#d7c39a"
+        cellColor="#e2e8f0"
         cellSize={1}
-        fadeDistance={34}
-        fadeStrength={0.6}
+        fadeDistance={40}
+        fadeStrength={0.5}
         infiniteGrid={false}
-        position={[0, 0.02, 0]}
-        sectionColor="#cab382"
+        position={[0, 0.01, 0]}
+        sectionColor="#cbd5e1"
         sectionSize={4}
       />
 
-      <mesh castShadow position={[0, floorSize.wallHeight / 2, -floorSize.depth / 2]}>
-        <boxGeometry args={[floorSize.width, floorSize.wallHeight, 0.3]} />
-        <meshStandardMaterial color="#d6d9e2" />
+      {/* Back Wall with Windows */}
+      <group position={[0, floorSize.wallHeight / 2, -floorSize.depth / 2]}>
+        <mesh castShadow receiveShadow>
+          <boxGeometry args={[floorSize.width, floorSize.wallHeight, 0.15]} />
+          <meshStandardMaterial color="#f1f5f9" />
+        </mesh>
+        {/* Window Panels */}
+        <group position={[0, floorSize.wallHeight * 0.1, 0.1]}>
+          {[-8, -4, 0, 4, 8].map((x) => (
+            <mesh key={x} position={[x, 0, 0]}>
+              <boxGeometry args={[2.5, 1.4, 0.02]} />
+              <meshStandardMaterial 
+                color="#ffffff" 
+                emissive="#ffffff" 
+                emissiveIntensity={0.12} 
+                opacity={0.3} 
+                transparent 
+                polygonOffset
+                polygonOffsetFactor={-1}
+              />
+            </mesh>
+          ))}
+        </group>
+      </group>
+
+      {/* Side Wall */}
+      <mesh castShadow receiveShadow position={[-floorSize.width / 2, floorSize.wallHeight / 2, 0]}>
+        <boxGeometry args={[0.15, floorSize.wallHeight, floorSize.depth]} />
+        <meshStandardMaterial color="#f1f5f9" />
       </mesh>
 
-      <mesh castShadow position={[-floorSize.width / 2, floorSize.wallHeight / 2, 0]}>
-        <boxGeometry args={[0.3, floorSize.wallHeight, floorSize.depth]} />
-        <meshStandardMaterial color="#eceff5" />
-      </mesh>
-
+      {/* Front Glass Wall */}
       <mesh castShadow position={[floorSize.width / 2, floorSize.wallHeight / 2, -1.2]}>
-        <boxGeometry args={[0.3, floorSize.wallHeight, floorSize.depth - 2.4]} />
-        <meshStandardMaterial color="#c7cbd5" opacity={0.88} transparent />
+        <boxGeometry args={[0.15, floorSize.wallHeight, floorSize.depth - 2.4]} />
+        <meshStandardMaterial color="#e2e8f0" opacity={0.3} transparent metalness={0.5} roughness={0.1} />
       </mesh>
 
       {zoneDefinitions.map((zone) => {
@@ -421,14 +547,7 @@ function OfficeWorld({
         );
       })}
 
-      {selectedAgent ? (
-        <Html center distanceFactor={16} position={[0, floorSize.wallHeight + 0.55, -floorSize.depth / 2 + 0.22]} transform>
-          <div className={styles.sceneCaption}>
-            <strong>{selectedAgent.name}</strong>
-            <span>{`${roomDisplayNames[selectedAgent.room]} / ${selectedAgent.status}`}</span>
-          </div>
-        </Html>
-      ) : null}
+      {/* Removed duplicate wall caption — agent info already displayed in OfficeUnit labels */}
     </>
   );
 }

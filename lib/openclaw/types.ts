@@ -1,4 +1,4 @@
-export type RoomId = "workstations" | "gym" | "restaurant" | "meeting";
+export type RoomId = "workstations" | "gym" | "restaurant" | "meeting" | "study";
 export type AgentStatus =
   | "working"
   | "idle"

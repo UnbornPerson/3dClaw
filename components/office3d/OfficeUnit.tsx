@@ -15,7 +15,7 @@ import {
   toFloorPosition
 } from "./sceneData";
 
-const geoShadow = new THREE.CircleGeometry(0.36, 24);
+const geoShadow = new THREE.CircleGeometry(0.28, 24);
 const geoRing = new THREE.TorusGeometry(0.5, 0.04, 12, 32);
 
 // Cute Pill-like shapes
@@ -114,10 +114,12 @@ export function OfficeUnit({
 
     const time = state.clock.elapsedTime + walkPhase.current;
     const walkSwing = isMovingRef.current && !isSeated ? Math.sin(time * 8) * 0.6 : 0;
+    const moveTilt = isMovingRef.current && !isSeated ? 0.12 : 0;
 
     if (bodyRef.current) {
       const bob = isMovingRef.current && !isSeated ? Math.sin(time * 8) * 0.04 : 0;
-      bodyRef.current.position.y = isSeated ? 0.08 : 0.32 + bob;
+      bodyRef.current.position.y = isSeated ? 0.14 : 0.32 + bob;
+      bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, moveTilt, 0.1);
     }
 
     if (torsoRef.current) {
@@ -198,7 +200,7 @@ export function OfficeUnit({
   return (
     <group ref={baseGroupRef}>
       <mesh geometry={geoShadow} position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <meshBasicMaterial color="#150b07" opacity={0.22 * baseOpacity} transparent />
+        <meshBasicMaterial color="#150b07" opacity={0.12 * baseOpacity} transparent />
       </mesh>
 
       {selected ? (
@@ -211,6 +213,7 @@ export function OfficeUnit({
         ref={bodyRef}
         onClick={() => onSelect(agent.id)}
         onPointerDown={(event) => event.stopPropagation()}
+        scale={[1.45, 1.45, 1.45]}
       >
         <group ref={torsoRef}>
           {/* Main Torso */}
@@ -228,9 +231,19 @@ export function OfficeUnit({
              <mesh geometry={geoHead} castShadow>
                <meshStandardMaterial color={agent.style.skin} opacity={baseOpacity} roughness={0.3} metalness={0.1} transparent />
              </mesh>
-             {/* Glowing Visor */}
-             <mesh geometry={geoVisor} castShadow position={[0.22, 0, 0]}>
-               <meshStandardMaterial color="#cffafe" emissive="#0ea5e9" emissiveIntensity={1.2} roughness={0.1} metalness={0.6} opacity={0.9 * baseOpacity} transparent />
+             {/* Glowing Visor - Offset to prevent Z-fighting */}
+             <mesh geometry={geoVisor} castShadow position={[0.24, 0, 0]}>
+               <meshStandardMaterial 
+                color="#cffafe" 
+                emissive="#0ea5e9" 
+                emissiveIntensity={1.2} 
+                roughness={0.1} 
+                metalness={0.6} 
+                opacity={0.9 * baseOpacity} 
+                transparent 
+                polygonOffset
+                polygonOffsetFactor={-1}
+               />
              </mesh>
              {/* Headphones (Ears) */}
              <mesh geometry={geoEar} castShadow position={[0, 0, 0.24]} rotation={[Math.PI/2, 0, 0]}>
@@ -284,7 +297,7 @@ export function OfficeUnit({
       </group>
 
       {!hideLabel && (selected || shouldShowLabel) ? (
-        <Html center distanceFactor={11} position={[0.14, Boolean(seatAnchor) && !isMovingRef.current ? 1.44 : 1.86, 0]} sprite transform>
+        <Html center distanceFactor={11} position={[0.14, Boolean(seatAnchor) && !isMovingRef.current ? 1.72 : 2.1, 0]} sprite transform>
           <button
             className={`${styles.unitLabel} ${selected ? styles.unitLabelSelected : ""} ${
               dimmed ? styles.unitLabelMuted : ""

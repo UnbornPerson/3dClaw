@@ -40,18 +40,20 @@ interface HomePageProps {
 }
 
 const roomNames: Record<RoomId, string> = {
-  workstations: "工位区",
+  workstations: "办公区",
   meeting: "会议室",
   gym: "健身房",
-  restaurant: "餐厅"
+  restaurant: "休息室",
+  study: "学习区"
 };
 
 const roomFilters: Array<{ id: RoomId | "all"; label: string }> = [
   { id: "all", label: "全楼层" },
-  { id: "workstations", label: "工位区" },
+  { id: "workstations", label: "办公区" },
   { id: "meeting", label: "会议室" },
   { id: "gym", label: "健身房" },
-  { id: "restaurant", label: "餐厅" }
+  { id: "restaurant", label: "休息室" },
+  { id: "study", label: "学习区" }
 ];
 
 const statusDots = {
@@ -172,22 +174,44 @@ export default function HomePage({
   useEffect(() => {
     if (!snapshot) return;
 
+    // Room boundaries in normalized 0-100 space (approximate from zone definitions)
+    const roomBounds: Record<RoomId, { xMin: number; xMax: number; yMin: number; yMax: number }> = {
+      meeting:      { xMin: 0,  xMax: 33, yMin: 0,  yMax: 38 },
+      study:        { xMin: 0,  xMax: 33, yMin: 55, yMax: 100 },
+      workstations: { xMin: 34, xMax: 80, yMin: 0,  yMax: 100 },
+      gym:          { xMin: 81, xMax: 100, yMin: 0,  yMax: 38 },
+      restaurant:   { xMin: 81, xMax: 100, yMin: 58, yMax: 100 }
+    };
+
     const interval = window.setInterval(() => {
       setRoamingTargets((current) => {
         const next = { ...current };
-        const idleAgents = snapshot.agents.filter((a) => a.status === "idle");
-        if (idleAgents.length > 0) {
-          const randomAgent = idleAgents[Math.floor(Math.random() * idleAgents.length)];
-          const basePos = current[randomAgent.id] ?? randomAgent.position;
+        // All agents that aren't seated at workstations working, and aren't offline, should roam
+        const roamingAgents = snapshot.agents.filter(
+          (a) => a.status !== "offline" && !(a.room === "workstations" && a.status === "working")
+        );
+        // Move each roaming agent with some probability each tick
+        for (const agent of roamingAgents) {
+          if (Math.random() < 0.6) {
+            const basePos = current[agent.id] ?? agent.position;
+            const bounds = roomBounds[agent.room];
 
-          next[randomAgent.id] = {
-            x: Math.max(0, Math.min(100, basePos.x + (Math.random() - 0.5) * 20)),
-            y: Math.max(0, Math.min(100, basePos.y + (Math.random() - 0.5) * 20))
-          };
+            if (bounds) {
+              next[agent.id] = {
+                x: Math.max(bounds.xMin, Math.min(bounds.xMax, basePos.x + (Math.random() - 0.5) * 12)),
+                y: Math.max(bounds.yMin, Math.min(bounds.yMax, basePos.y + (Math.random() - 0.5) * 12))
+              };
+            } else {
+              next[agent.id] = {
+                x: Math.max(0, Math.min(100, basePos.x + (Math.random() - 0.5) * 12)),
+                y: Math.max(0, Math.min(100, basePos.y + (Math.random() - 0.5) * 12))
+              };
+            }
+          }
         }
         return next;
       });
-    }, 3800);
+    }, 2500);
 
     return () => window.clearInterval(interval);
   }, [snapshot]);

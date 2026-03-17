@@ -84,10 +84,11 @@ function generateWorldFromSessions(sessions: any[], status: any): WorldData {
   
   // Default rooms
   const rooms = [
-    { id: "workstations", name: "工位区", description: "核心执行与排班区域", capacity: 8, color: "#c96b3f", anchor: { x: 27, y: 24 } },
-    { id: "meeting", name: "会议室", description: "策略评审与联动决策", capacity: 4, color: "#4b7a78", anchor: { x: 72, y: 20 } },
-    { id: "gym", name: "健身房", description: "恢复训练与动作校准", capacity: 3, color: "#6b8a48", anchor: { x: 22, y: 72 } },
-    { id: "restaurant", name: "餐厅", description: "能量补给与休息", capacity: 5, color: "#b2834e", anchor: { x: 73, y: 68 } }
+    { id: "workstations", name: "办公区", description: "核心执行与排班区域", capacity: 8, color: "#c96b3f", anchor: { x: 57, y: 50 } },
+    { id: "meeting", name: "会议室", description: "策略评审与联动决策", capacity: 4, color: "#4b7a78", anchor: { x: 14, y: 15 } },
+    { id: "study", name: "学习区", description: "资料查阅与自主学习", capacity: 4, color: "#8c6bb1", anchor: { x: 14, y: 80 } },
+    { id: "gym", name: "健身房", description: "恢复训练与动作校准", capacity: 3, color: "#6b8a48", anchor: { x: 95, y: 15 } },
+    { id: "restaurant", name: "休息室", description: "能量补给与放松休息", capacity: 5, color: "#b2834e", anchor: { x: 95, y: 84 } }
   ];
 
   // Generate agents from sessions
